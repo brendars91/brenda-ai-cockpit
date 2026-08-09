@@ -1,0 +1,78 @@
+
+# Sys
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+/.env.production
+.env.local
+.env.*.local
+.env.production
+.venv
+env/
+venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+
+# Gem Trinity Specifics
+artifacts/context_payload.json
+artifacts/
+local-watcher/artifacts/
+logs/
+tmp/
+
+# IDE
+.vscode/
+.idea/
+
+# Local Config Overrides (si aplica)
+# mcp_config_local.json (Now portable)
+artifacts/state.sqlite
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+*.cover
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Build artifacts
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+.nul
+nul
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

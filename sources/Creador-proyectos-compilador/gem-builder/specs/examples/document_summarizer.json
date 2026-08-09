@@ -1,0 +1,44 @@
+{
+    "use_case_id": "document_summarizer",
+    "goal": "Resumir documentos de Google Drive en markdown estructurado",
+    "domain": "document-processing",
+    "users": [
+        "end_user",
+        "analyst"
+    ],
+    "data_sources": [
+        {
+            "type": "drive",
+            "access": "read",
+            "sensitivity": "internal",
+            "description": "Documentos de la carpeta Drive/Projects"
+        }
+    ],
+    "actions": [
+        {
+            "type": "read",
+            "side_effects": false,
+            "description": "Leer contenido del documento"
+        },
+        {
+            "type": "summarize",
+            "side_effects": false,
+            "description": "Generar resumen estructurado"
+        }
+    ],
+    "output": {
+        "type": "markdown"
+    },
+    "constraints": {
+        "latency_ms": 5000,
+        "cost_tier": "low",
+        "max_tokens": 1000
+    },
+    "security": {
+        "hitl_required": "auto",
+        "read_only": true
+    },
+    "grounding": {
+        "required": false
+    }
+}

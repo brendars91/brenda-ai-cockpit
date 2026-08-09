@@ -1,0 +1,69 @@
+{
+    "template_id": "TPL-SECURITY-AUDIT",
+    "name": "Auditoría de Seguridad",
+    "description": "Template para realizar auditoría de seguridad completa",
+    "category": "security",
+    "variables": {
+        "scope": "Alcance de la auditoría (todo el proyecto, módulo específico)",
+        "focus_areas": "Áreas de enfoque (auth, inputs, deps, secrets)"
+    },
+    "plan_template": {
+        "schema_version": "1.0.0",
+        "plan_id": "PLAN-{{timestamp}}",
+        "objective": {
+            "description": "Auditoría de seguridad: {{scope}}",
+            "scope": "security",
+            "requires_hitl": true
+        },
+        "steps": [
+            {
+                "id": "S01",
+                "action": "analyze",
+                "target": ".",
+                "description": "Escaneo de secretos y API keys",
+                "tool": "secrets_detector",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S02",
+                "action": "analyze",
+                "target": ".",
+                "description": "Escaneo Snyk Code",
+                "tool": "snyk_code_scan",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S03",
+                "action": "analyze",
+                "target": "requirements.txt",
+                "description": "Escaneo de dependencias",
+                "tool": "snyk_sca_scan",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S04",
+                "action": "write",
+                "target": "SECURITY_REPORT.md",
+                "description": "Generar reporte de hallazgos",
+                "tool": "mcp_filesystem_write_file",
+                "requires_human_approval": true
+            },
+            {
+                "id": "S05",
+                "action": "write",
+                "target": "affected_files",
+                "description": "Aplicar correcciones críticas",
+                "tool": "mcp_filesystem_edit_file",
+                "requires_human_approval": true
+            }
+        ],
+        "evidence": {
+            "required": [
+                "secrets_scan_output",
+                "snyk_code_output",
+                "snyk_deps_output",
+                "remediation_summary"
+            ]
+        }
+    }
+}

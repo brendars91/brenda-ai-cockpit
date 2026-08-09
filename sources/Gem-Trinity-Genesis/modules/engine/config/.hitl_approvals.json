@@ -1,0 +1,26 @@
+{
+  "approvals": {
+    "PLAN-EXAMPLE1": {
+      "S03": {
+        "approved": true,
+        "approved_at": "2026-01-17T11:15:09.154292",
+        "approved_by": "human"
+      },
+      "S04": {
+        "approved": true,
+        "approved_at": "2026-01-17T11:16:00.988287",
+        "approved_by": "human"
+      },
+      "S05": {
+        "approved": true,
+        "approved_at": "2026-01-17T11:16:24.380918",
+        "approved_by": "human"
+      },
+      "S08": {
+        "approved": true,
+        "approved_at": "2026-01-17T11:16:46.650765",
+        "approved_by": "human"
+      }
+    }
+  }
+}

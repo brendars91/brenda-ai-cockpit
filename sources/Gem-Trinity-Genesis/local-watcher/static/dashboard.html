@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gem Trinity Genesis - White Box Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-healthy {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        button.danger-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button.danger-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div>
+            <h1>Gem Trinity Genesis <span style="font-size: 0.6em; color: var(--text-secondary)">v2026.2.1</span></h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="api-status-badge" class="status-badge status-healthy">Checking...</span>
+                <span style="font-size: 0.9em; color: var(--text-secondary)" id="last-updated">Running</span>
+            </div>
+        </div>
+        <button class="danger-btn" onclick="wipeProjects()">⚠️ WIPE ALL DATA</button>
+    </div>
+
+    <div class="grid">
+        <!-- Operations Card -->
+        <div class="card">
+            <h3>Operations</h3>
+            <div class="metric-value" id="total-ops">0</div>
+            <div class="metric-label">Total Requests</div>
+            <div style="margin-top: 15px; height: 150px;">
+                <canvas id="opsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Determinism Card -->
+        <div class="card">
+            <h3>Determinism vs LLM</h3>
+            <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 10px;">
+                <div>
+                    <div class="metric-value" style="font-size: 1.5rem; color: var(--accent)" id="det-percent">0%</div>
+                    <div class="metric-label">Code (Fast)</div>
+                </div>
+                <div>
+                    <div class="metric-value" style="font-size: 1.5rem; color: #8b5cf6" id="llm-percent">0%</div>
+                    <div class="metric-label">LLM (Smart)</div>
+                </div>
+            </div>
+            <div style="height: 120px;">
+                <canvas id="ratioChart"></canvas>
+            </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="card">
+            <h3>System Health</h3>
+            <div style="margin-top: 10px">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>CPU Usage</span>
+                    <span id="cpu-val">0%</span>
+                </div>
+                <div style="background: #334155; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="cpu-bar"
+                        style="width: 0%; height: 100%; background: var(--accent); transition: width 0.5s;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 20px">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Memory Usage</span>
+                    <span id="mem-val">0%</span>
+                </div>
+                <div style="background: #334155; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="mem-bar"
+                        style="width: 0%; height: 100%; background: var(--success); transition: width 0.5s;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 20px; font-size: 0.9em; color: var(--text-secondary);">
+                Disk: <span id="disk-val">Checking...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charts initialization
+        const ratioCtx = document.getElementById('ratioChart').getContext('2d');
+        const ratioChart = new Chart(ratioCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Deterministic', 'LLM'],
+                datasets: [{
+                    data: [50, 50],
+                    backgroundColor: ['#3b82f6', '#8b5cf6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '70%'
+            }
+        });
+
+        const opsCtx = document.getElementById('opsChart').getContext('2d');
+        const opsChart = new Chart(opsCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Ops',
+                    data: [],
+                    borderColor: '#10b981',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                },
+                elements: { point: { radius: 0 } }
+            }
+        });
+
+        async function updateDashboard() {
+            try {
+                // Fetch Metrics
+                const metricsRes = await fetch('/api/metrics');
+                const metrics = await metricsRes.json();
+
+                document.getElementById('total-ops').innerText = metrics.total_operations;
+                document.getElementById('det-percent').innerText = metrics.determinism_percentage + '%';
+                document.getElementById('llm-percent').innerText = metrics.llm_percentage + '%';
+
+                ratioChart.data.datasets[0].data = [metrics.determinism_percentage, metrics.llm_percentage];
+                ratioChart.update();
+
+                // Mock history for sparkline (in real app, use history endpoint)
+                const now = new Date().toLocaleTimeString();
+                if (opsChart.data.labels.length > 20) {
+                    opsChart.data.labels.shift();
+                    opsChart.data.datasets[0].data.shift();
+                }
+                opsChart.data.labels.push(now);
+                opsChart.data.datasets[0].data.push(metrics.total_operations); // Ideally this would be ops/sec
+                opsChart.update();
+
+                // Fetch Health
+                const healthRes = await fetch('/api/health/detailed');
+                const health = await healthRes.json();
+
+                if (health.status === 'healthy') {
+                    document.getElementById('api-status-badge').className = 'status-badge status-healthy';
+                    document.getElementById('api-status-badge').innerText = 'SYSTEM OPERATIONAL';
+                } else {
+                    document.getElementById('api-status-badge').className = 'status-badge status-error';
+                    document.getElementById('api-status-badge').innerText = 'SYSTEM ISSUES';
+                }
+
+                if (health.resources) {
+                    // CPU (Mocked if not available in basic info, detailed has memory)
+                    // Note: Browser can't see server CPU easily without specific endpoint, 
+                    // assuming health endpoint provides snapshot
+                    // Since psutil is used in health_checks.py
+
+                    const memPercent = health.resources.memory.percent_used;
+                    document.getElementById('mem-val').innerText = memPercent + '%';
+                    document.getElementById('mem-bar').style.width = memPercent + '%';
+
+                    const diskPercent = health.resources.disk.percent_used;
+                    document.getElementById('disk-val').innerText = `${health.resources.disk.free_gb}GB Free (${diskPercent}% used)`;
+                }
+
+            } catch (e) {
+                console.error("Dashboard update failed", e);
+                document.getElementById('api-status-badge').className = 'status-badge status-error';
+                document.getElementById('api-status-badge').innerText = 'CONNECTION LOST';
+            }
+
+            document.getElementById('last-updated').innerText = 'Updated: ' + new Date().toLocaleTimeString();
+        }
+
+        async function wipeProjects() {
+            if (!confirm("⚠️ DANGER: This will delete ALL projects and reset the server. Are you sure?")) return;
+
+            try {
+                const res = await fetch('/api/admin/wipe', { method: 'DELETE' });
+                const data = await res.json();
+                alert(data.message || "Wipe successful");
+                window.location.reload();
+            } catch (e) {
+                alert("Wipe failed: " + e);
+            }
+        }
+
+        // Update every 2 seconds
+        setInterval(updateDashboard, 2000);
+        updateDashboard();
+    </script>
+</body>
+
+</html>

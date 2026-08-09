@@ -1,0 +1,15 @@
+# Dependencias Python para AGCCE Ultra
+# =====================================
+# Instalar con: pip install -r requirements.txt
+
+# Core
+pathlib2>=2.3.7  # Compatibilidad de rutas (Python <3.4)
+
+# Opcional - Para funcionalidades avanzadas
+# requests>=2.28.0  # Para webhooks n8n (descomenta si usas n8n)
+# python-dotenv>=1.0.0  # Para cargar .env (descomenta si usas)
+
+# Desarrollo (opcional)
+# pytest>=7.0.0
+# black>=23.0.0
+# mypy>=1.0.0

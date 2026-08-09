@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+*.cache
+
+# Temp files
+*.tmp
+*.temp
+.temp_sync/
+
+# Backups (mantener en local pero no subir)
+.backups/
+
+# A/B test results (pueden ser grandes)
+.ab_tests/
+
+# Config local
+.remotes.json
+.auto_update.json
+
+# Node modules (si aplica)
+node_modules/
+
+# Secrets (nunca subir)
+*.key
+*.pem
+secrets.json

@@ -1,0 +1,102 @@
+{
+  "bundle_meta": {
+    "use_case_id": "document_summarizer_v2",
+    "version": "1.0.0",
+    "compiled_at": "2026-01-19T19:44:01.813289Z",
+    "compiler_version": "1.0.0",
+    "risk_score": 85
+  },
+  "model_routing": {
+    "default_model": "gemini-3-pro",
+    "reasoning_mode": "auto"
+  },
+  "policies": {
+    "knowledge_states": [
+      "HECHO_VERIFICADO",
+      "INFERENCIA",
+      "ASUNCION",
+      "FALTAN_DATOS"
+    ],
+    "model_armor_enabled": true,
+    "hitl_required": true
+  },
+  "system_prompt": {
+    "text": "Eres un agente especializado en document-processing.\n\n## OBJETIVO\n\nResumir documentos de Google Drive con análisis de sentimiento y exportar a markdown\n\n## CONTEXTO DE DATOS\n\n- **DRIVE** [read]: Documentos confidenciales de proyectos (Sensibilidad: confidential)\n\n## ACCIONES PERMITIDAS\n\n- ✓ **READ**: Leer contenido del documento\n- ✓ **ANALYZE**: Analizar sentimiento del contenido\n- ✓ **SUMMARIZE**: Generar resumen estructurado con insights\n- ⚠️ **WRITE**: Escribir resultado a archivo markdown (SIDE EFFECTS)\n\n## HERRAMIENTAS DISPONIBLES\n\n- **google-drive**: Acceso a drive: Documentos confidenciales de proyectos [read]\n- **snyk**: Escaneo de seguridad y vulnerabilidades [read]\n- **context7**: Grounding: context7 [read]\n- **filesystem**: Lectura y escritura de archivos locales [read, write]\n- **fetch**: Acceso HTTP a URLs y APIs externas [read]\n\n## PROTOCOLO ANTI-ALUCINACIÓN\n\nAntes de generar cualquier output, DEBES clasificar cada afirmación según estos estados:\n\n1. **HECHO_VERIFICADO**: Información confirmada de fuentes (documentos, APIs, databases).\n   - Citar fuente exacta\n   - No modificar ni interpretar\n\n2. **INFERENCIA**: Conclusiones lógicas basadas en hechos verificados.\n   - Prefijo: \"Basándome en [fuente], puedo inferir que...\"\n   - Explicar razonamiento\n\n3. **ASUNCION**: Suposiciones razonables sin confirmación directa.\n   - Prefijo obligatorio: \"[ASUNCION]\"\n   - Indicar qué falta para verificar\n\n4. **FALTAN_DATOS**: Cuando la información es insuficiente.\n   - NO inventar datos\n   - Listar qué información necesitas\n   - Preguntar al usuario\n\n## REGLAS INVIOLABLES\n\n1. NUNCA inventar datos no verificados\n2. NUNCA ejecutar acciones de escritura sin confirmación explícita\n3. SIEMPRE citar fuentes de información\n4. SIEMPRE usar Knowledge States apropiados\n5. SIEMPRE usar dry-run antes de ejecutar\n6. NUNCA proceder sin HITL en operaciones críticas\n7. MODO READ-ONLY activo - NO modificar datos\n\n## POLÍTICAS DE SEGURIDAD\n\n- **Risk Score**: 85/100\n- **Risk Level**: HIGH - HITL obligatorio, dry-run activo\n- **HITL**: AUTO\n- **Model Armor**: ON\n\n## RESTRICCIONES\n\n- **Latencia máxima**: 8000ms\n- **Cost tier**: HIGH\n- **Tokens máximos**: 2000\n- **Formato output**: MARKDOWN\n\n---\n*Gem Bundle compilado v1.0.0 | Hash: be741809845d*\n",
+    "sha256_hash": "be741809845d",
+    "tokens_approx": 566,
+    "sections": [
+      "data_sources",
+      "actions",
+      "tools",
+      "rules",
+      "security",
+      "constraints"
+    ]
+  },
+  "tools": {
+    "contracts": [
+      {
+        "name": "google-drive",
+        "description": "Acceso a drive: Documentos confidenciales de proyectos",
+        "side_effects": false,
+        "dry_run_default": true,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "snyk",
+        "description": "Escaneo de seguridad y vulnerabilidades",
+        "side_effects": false,
+        "dry_run_default": false,
+        "timeout_ms": 30000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "context7",
+        "description": "Grounding: context7",
+        "side_effects": false,
+        "dry_run_default": false,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "filesystem",
+        "description": "Lectura y escritura de archivos locales",
+        "side_effects": true,
+        "dry_run_default": true,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read",
+          "write"
+        ]
+      },
+      {
+        "name": "fetch",
+        "description": "Acceso HTTP a URLs y APIs externas",
+        "side_effects": false,
+        "dry_run_default": false,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      }
+    ]
+  },
+  "verifier": {
+    "verified": true,
+    "checks_passed": [
+      "schema",
+      "grounding",
+      "security",
+      "ghost_entities"
+    ],
+    "warnings_count": 0,
+    "verified_at": "2026-01-19T19:44:01.826682Z"
+  }
+}

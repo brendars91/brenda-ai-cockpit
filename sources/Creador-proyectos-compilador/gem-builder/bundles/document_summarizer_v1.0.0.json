@@ -1,0 +1,91 @@
+{
+  "bundle_meta": {
+    "use_case_id": "document_summarizer",
+    "version": "1.0.0",
+    "compiled_at": "2026-01-19T19:44:01.813289Z",
+    "compiler_version": "1.0.0",
+    "risk_score": 35
+  },
+  "model_routing": {
+    "default_model": "gemini-flash",
+    "reasoning_mode": "auto"
+  },
+  "policies": {
+    "knowledge_states": [
+      "HECHO_VERIFICADO",
+      "INFERENCIA",
+      "ASUNCION",
+      "FALTAN_DATOS"
+    ],
+    "model_armor_enabled": false,
+    "hitl_required": false
+  },
+  "system_prompt": {
+    "text": "Eres un agente especializado en document-processing.\n\n## OBJETIVO\n\nResumir documentos de Google Drive en markdown estructurado\n\n## CONTEXTO DE DATOS\n\n- **DRIVE** [read]: Documentos de la carpeta Drive/Projects (Sensibilidad: internal)\n\n## ACCIONES PERMITIDAS\n\n- ✓ **READ**: Leer contenido del documento\n- ✓ **SUMMARIZE**: Generar resumen estructurado\n\n## HERRAMIENTAS DISPONIBLES\n\n- **google-drive**: Acceso a drive: Documentos de la carpeta Drive/Projects [read]\n- **snyk**: Escaneo de seguridad y vulnerabilidades [read]\n- **filesystem**: Lectura y escritura de archivos locales [read]\n- **fetch**: Acceso HTTP a URLs y APIs externas [read]\n\n## PROTOCOLO ANTI-ALUCINACIÓN\n\nAntes de generar cualquier output, DEBES clasificar cada afirmación según estos estados:\n\n1. **HECHO_VERIFICADO**: Información confirmada de fuentes (documentos, APIs, databases).\n   - Citar fuente exacta\n   - No modificar ni interpretar\n\n2. **INFERENCIA**: Conclusiones lógicas basadas en hechos verificados.\n   - Prefijo: \"Basándome en [fuente], puedo inferir que...\"\n   - Explicar razonamiento\n\n3. **ASUNCION**: Suposiciones razonables sin confirmación directa.\n   - Prefijo obligatorio: \"[ASUNCION]\"\n   - Indicar qué falta para verificar\n\n4. **FALTAN_DATOS**: Cuando la información es insuficiente.\n   - NO inventar datos\n   - Listar qué información necesitas\n   - Preguntar al usuario\n\n## REGLAS INVIOLABLES\n\n1. NUNCA inventar datos no verificados\n2. NUNCA ejecutar acciones de escritura sin confirmación explícita\n3. SIEMPRE citar fuentes de información\n4. SIEMPRE usar Knowledge States apropiados\n⚠️ MODO READ-ONLY: Solo lectura permitida\n\n## POLÍTICAS DE SEGURIDAD\n\n- **Risk Score**: 35/100\n- **Risk Level**: MEDIUM - Model Armor activado\n- **HITL**: AUTO\n- **Model Armor**: ON\n\n## RESTRICCIONES\n\n- **Latencia máxima**: 5000ms\n- **Cost tier**: LOW\n- **Tokens máximos**: 1000\n- **Formato output**: MARKDOWN\n\n---\n*Gem Bundle compilado v1.0.0 | Hash: ac1e4da6d6b8*\n",
+    "sha256_hash": "ac1e4da6d6b8",
+    "tokens_approx": 486,
+    "sections": [
+      "data_sources",
+      "actions",
+      "tools",
+      "rules",
+      "security",
+      "constraints"
+    ]
+  },
+  "tools": {
+    "contracts": [
+      {
+        "name": "google-drive",
+        "description": "Acceso a drive: Documentos de la carpeta Drive/Projects",
+        "side_effects": false,
+        "dry_run_default": true,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "snyk",
+        "description": "Escaneo de seguridad y vulnerabilidades",
+        "side_effects": false,
+        "dry_run_default": true,
+        "timeout_ms": 30000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "filesystem",
+        "description": "Lectura y escritura de archivos locales",
+        "side_effects": false,
+        "dry_run_default": true,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      },
+      {
+        "name": "fetch",
+        "description": "Acceso HTTP a URLs y APIs externas",
+        "side_effects": false,
+        "dry_run_default": true,
+        "timeout_ms": 5000,
+        "permissions": [
+          "read"
+        ]
+      }
+    ]
+  },
+  "verifier": {
+    "verified": true,
+    "checks_passed": [
+      "schema",
+      "grounding",
+      "security",
+      "ghost_entities"
+    ],
+    "warnings_count": 2,
+    "verified_at": "2026-01-19T19:44:01.827709Z"
+  }
+}

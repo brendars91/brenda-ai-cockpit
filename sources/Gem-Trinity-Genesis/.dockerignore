@@ -1,0 +1,63 @@
+# ========================================
+# .dockerignore - Gem Trinity Genesis
+# Optimizar tamaño de imagen Docker
+# ========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Node.js (Frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Logs
+*.log
+logs/*.log
+
+# Cache
+.pytest_cache/
+.cache/
+cache/*
+
+# Temporal
+.temp/
+.tmp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentación local
+docs/
+README.md
+*.md
+
+# Archivos de configuración local
+.env.local
+.env.*.local
+
+# Archivos grandes de artifacts (opcional)
+# artifacts/project_outputs/*/

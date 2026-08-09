@@ -1,0 +1,20 @@
+# Python dependencies for Gem Builder Compiler
+
+# Core
+jsonschema>=4.17.0  # Schema validation
+
+# CLI (para futuros sprints con Rich TUI)
+rich>=13.0.0  # Terminal UI
+click>=8.1.0  # CLI framework (alternativa a argparse)
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Code quality
+ruff>=0.1.0  # Linter
+black>=23.0.0  # Formatter
+
+# Telemetry (Sprint 5)
+opentelemetry-api>=1.20.0
+opentelemetry-sdk>=1.20.0

@@ -1,0 +1,155 @@
+{
+  "summary": {
+    "test_name": "ab_test_summarizers",
+    "winner": "document_summarizer_v1.0.0",
+    "gem_a": {
+      "name": "document_summarizer_v1.0.0",
+      "avg_latency_ms": 527.4444444444445,
+      "avg_tokens": 95,
+      "avg_quality": 0.65
+    },
+    "gem_b": {
+      "name": "document_summarizer_v2_v1.0.0",
+      "avg_latency_ms": 1517.888888888889,
+      "avg_tokens": 92.33333333333333,
+      "avg_quality": 0.4
+    },
+    "differences_pct": {
+      "latency": 187.78175689909415,
+      "tokens": -2.807017543859654,
+      "quality": -38.46153846153846
+    },
+    "total_iterations": 18,
+    "completed_at": "2026-01-19T17:47:36.097463+00:00"
+  },
+  "raw_results_a": [
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 0,
+      "latency_ms": 427,
+      "tokens_output": 91,
+      "quality_score": 0.6799999999999999
+    },
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 1,
+      "latency_ms": 449,
+      "tokens_output": 92,
+      "quality_score": 0.6799999999999999
+    },
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 2,
+      "latency_ms": 625,
+      "tokens_output": 99,
+      "quality_score": 0.6799999999999999
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 0,
+      "latency_ms": 452,
+      "tokens_output": 85,
+      "quality_score": 0.63
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 1,
+      "latency_ms": 536,
+      "tokens_output": 90,
+      "quality_score": 0.63
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 2,
+      "latency_ms": 480,
+      "tokens_output": 111,
+      "quality_score": 0.63
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 0,
+      "latency_ms": 423,
+      "tokens_output": 65,
+      "quality_score": 0.64
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 1,
+      "latency_ms": 663,
+      "tokens_output": 75,
+      "quality_score": 0.64
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 2,
+      "latency_ms": 692,
+      "tokens_output": 147,
+      "quality_score": 0.64
+    }
+  ],
+  "raw_results_b": [
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 0,
+      "latency_ms": 1547,
+      "tokens_output": 82,
+      "quality_score": 0.43
+    },
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 1,
+      "latency_ms": 1437,
+      "tokens_output": 122,
+      "quality_score": 0.43
+    },
+    {
+      "prompt": "Analiza este documento y genera un resumen",
+      "iteration": 2,
+      "latency_ms": 1430,
+      "tokens_output": 108,
+      "quality_score": 0.43
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 0,
+      "latency_ms": 1408,
+      "tokens_output": 118,
+      "quality_score": 0.38
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 1,
+      "latency_ms": 1453,
+      "tokens_output": 98,
+      "quality_score": 0.38
+    },
+    {
+      "prompt": "Lista los puntos clave del texto",
+      "iteration": 2,
+      "latency_ms": 1459,
+      "tokens_output": 90,
+      "quality_score": 0.38
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 0,
+      "latency_ms": 1624,
+      "tokens_output": 78,
+      "quality_score": 0.39
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 1,
+      "latency_ms": 1659,
+      "tokens_output": 67,
+      "quality_score": 0.39
+    },
+    {
+      "prompt": "Identifica las acciones pendientes",
+      "iteration": 2,
+      "latency_ms": 1644,
+      "tokens_output": 68,
+      "quality_score": 0.39
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+name: deterministic-gates
+on:
+  pull_request:
+  push:
+    branches: [main, initial/domain-consolidation]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Secret scan
+        run: python3 tools/secret_scan.py .
+      - name: Repo contract check
+        run: python3 tools/validate_repo.py

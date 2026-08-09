@@ -1,0 +1,239 @@
+{
+    "name": "[Example] Basic Webhook Handler",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "order-webhook",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-1",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "order-webhook-id"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Validar payload\nconst payload = $json;\n\nif (!payload.orderId) {\n  throw new Error('Missing orderId');\n}\n\nif (!payload.customer?.email) {\n  throw new Error('Missing customer email');\n}\n\n// Enriquecer datos\nreturn [{\n  json: {\n    orderId: payload.orderId,\n    customer: payload.customer,\n    items: payload.items || [],\n    total: payload.items?.reduce((sum, i) => sum + (i.price * i.quantity), 0) || 0,\n    processedAt: new Date().toISOString(),\n    status: 'validated'\n  }\n}];"
+            },
+            "id": "code-1",
+            "name": "Validate & Enrich",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                470,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "number": [
+                        {
+                            "value1": "={{ $json.total }}",
+                            "operation": "larger",
+                            "value2": 100
+                        }
+                    ]
+                }
+            },
+            "id": "if-1",
+            "name": "High Value Order?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                690,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "name": "priority",
+                            "value": "high",
+                            "type": "string"
+                        },
+                        {
+                            "name": "requiresReview",
+                            "value": true,
+                            "type": "boolean"
+                        }
+                    ]
+                }
+            },
+            "id": "set-1",
+            "name": "Set High Priority",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                910,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "name": "priority",
+                            "value": "normal",
+                            "type": "string"
+                        },
+                        {
+                            "name": "requiresReview",
+                            "value": false,
+                            "type": "boolean"
+                        }
+                    ]
+                }
+            },
+            "id": "set-2",
+            "name": "Set Normal Priority",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                910,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "mergeByFields": {
+                    "values": []
+                },
+                "options": {}
+            },
+            "id": "merge-1",
+            "name": "Merge",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3,
+            "position": [
+                1130,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ { \"success\": true, \"orderId\": $json.orderId, \"priority\": $json.priority, \"processedAt\": $json.processedAt } }}",
+                "options": {
+                    "responseCode": 200,
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "X-Processed-By",
+                                "value": "n8n-workflow"
+                            }
+                        ]
+                    }
+                }
+            },
+            "id": "respond-1",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1350,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Validate & Enrich",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Validate & Enrich": {
+            "main": [
+                [
+                    {
+                        "node": "High Value Order?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "High Value Order?": {
+            "main": [
+                [
+                    {
+                        "node": "Set High Priority",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Set Normal Priority",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Set High Priority": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Set Normal Priority": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Merge": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "saveExecutionProgress": true,
+        "saveManualExecutions": true,
+        "saveDataErrorExecution": "all",
+        "saveDataSuccessExecution": "all"
+    },
+    "tags": [
+        {
+            "name": "example"
+        },
+        {
+            "name": "webhook"
+        }
+    ]
+}

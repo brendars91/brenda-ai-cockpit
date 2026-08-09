@@ -1,0 +1,4 @@
+# Caddyfile placeholder
+:8080 {
+  respond "Cockpit - OK"
+}

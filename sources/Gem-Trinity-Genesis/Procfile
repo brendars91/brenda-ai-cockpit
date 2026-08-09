@@ -1,0 +1,1 @@
+web: cd local-watcher && python api_server.py

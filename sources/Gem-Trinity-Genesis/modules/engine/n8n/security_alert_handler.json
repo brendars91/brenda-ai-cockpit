@@ -1,0 +1,164 @@
+{
+    "name": "AGCCE Security Alert Handler",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "agcce-security-alert",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.event_type }}",
+                            "operation": "equals",
+                            "value2": "SECURITY_BREACH_ATTEMPT"
+                        }
+                    ]
+                }
+            },
+            "id": "validate-event",
+            "name": "Validate Event Type",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// Extraer datos de seguridad\nconst payload = $input.first().json.payload;\n\nconst planId = payload.plan_id || 'Unknown';\nconst alertType = payload.alert_type || 'security_event';\nconst details = payload.details || {};\nconst severity = payload.severity || 'critical';\n\n// ALERTA CRITICA de seguridad\nconst alert = {\n  text: `🔴 *SECURITY ALERT - AGCCE*\\n\\n` +\n        `*Severity:* ${severity.toUpperCase()}\\n` +\n        `*Alert Type:* ${alertType}\\n` +\n        `*Plan ID:* ${planId}\\n` +\n        `*Details:* \\`\\`\\`${JSON.stringify(details, null, 2)}\\`\\`\\`\\n\\n` +\n        `⚠️ _Accion inmediata requerida_`,\n  planId: planId,\n  alertType: alertType,\n  severity: severity,\n  critical: severity === 'critical',\n  timestamp: new Date().toISOString()\n};\n\nreturn [{ json: alert }];"
+            },
+            "id": "format-security-alert",
+            "name": "Format Security Alert",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                650,
+                250
+            ]
+        },
+        {
+            "parameters": {
+                "channel": "#security-alerts",
+                "text": "={{ $json.text }}",
+                "otherOptions": {
+                    "mrkdwn": true
+                }
+            },
+            "id": "slack-security",
+            "name": "Alert Security Channel",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                850,
+                200
+            ],
+            "disabled": true,
+            "notesInFlow": true,
+            "notes": "Habilitar para alertas de seguridad criticas"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: true, message: 'Security alert logged', severity: $json.severity }) }}"
+            },
+            "id": "respond-success",
+            "name": "Respond Success",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                250
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: false, error: 'Invalid event type' }) }}",
+                "options": {
+                    "responseCode": 400
+                }
+            },
+            "id": "respond-error",
+            "name": "Respond Error",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                650,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Validate Event Type",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Validate Event Type": {
+            "main": [
+                [
+                    {
+                        "node": "Format Security Alert",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Respond Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format Security Alert": {
+            "main": [
+                [
+                    {
+                        "node": "Alert Security Channel",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Respond Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "tags": [
+        {
+            "name": "AGCCE"
+        },
+        {
+            "name": "Security"
+        }
+    ]
+}

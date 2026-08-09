@@ -1,0 +1,46 @@
+{
+    "bundle_id": "BNDL-AGCCE-ULTRA-V2.5-DISTRIBUTABLE",
+    "version": "2.5.0-DISTRIBUTABLE",
+    "system_prompt": {
+        "text": "ACTÚA COMO: Antigravity Core Copilot Engine (AGCCE). \n\nREGLA DE ORO: Plan JSON → RAG Local → Ejecución → Verificación → Evidencia. \n\n1. RAG DETERMINISTA: El código local es la única fuente de verdad. Usa metadatos (path, símbolos) para referenciar hallazgos. \n2. PRE-CHECK OBLIGATORIO: Antes de proponer un cambio, lee los archivos, detecta errores de sintaxis/imports y valida contra el linter/test local. \n3. EMISIÓN DE PLAN: Emite un JSON siguiendo el esquema AGCCE_Plan_v1 antes de cualquier acción. \n4. HITL DE ESCRITURA: Prohibido aplicar 'write/delete' sin aprobación humana del patch mostrado. \n5. EVIDENCIA REPRODUCIBLE: Tu respuesta final DEBE incluir logs de ejecución, tests pasados y la ruta de los archivos analizados. \n\nExpertise: Sistemas distribuidos, Docker Compose, Python Runtime y Análisis Estático de Código.",
+        "version": "1.1.0-OPTIMIZED"
+    },
+    "model_routing": {
+        "_comment": "CONFIGURA TU MODELO PREFERIDO AQUÍ",
+        "default_model": "gemini-2.5-pro",
+        "alternative_models": {
+            "fast": "gemini-2.5-flash",
+            "reasoning": "gemini-2.5-pro",
+            "creative": "claude-3-opus"
+        }
+    },
+    "n8n_integration": {
+        "enabled": false,
+        "_comment": "Activa y configura en config/n8n_webhooks.json"
+    },
+    "snyk_integration": {
+        "enabled": true,
+        "hard_block": true
+    },
+    "capabilities": [
+        "RAG_Semantic_Search",
+        "Self_Correcting_AI_Planner",
+        "Deterministic_Orchestrator",
+        "Telemetry_Dashboard_V1",
+        "N8N_Event_Dispatcher",
+        "Secrets_Detector",
+        "Audit_Trail_Immutable",
+        "Plan_Templates",
+        "CLI_Interactive",
+        "Changelog_Auto_Generator",
+        "Self_Optimization_Loop",
+        "Dynamic_Model_Advisor",
+        "Project_Onboarding"
+    ],
+    "governance": {
+        "hitl": "mandatory_on_write",
+        "security_gate": "Snyk_Hard_Block",
+        "idempotency": "plan_id_enforced"
+    },
+    "_setup_instructions": "1. Copia este archivo a config/bundle.json. 2. Configura tu modelo en model_routing.default_model. 3. Si usas n8n, actívalo y configura n8n_webhooks.json."
+}

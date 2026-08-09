@@ -1,0 +1,133 @@
+{
+    "plan_id": "PLAN-EXAMPLE1",
+    "version": "1.1",
+    "created_at": "2026-01-17T10:54:00+01:00",
+    "objective": {
+        "description": "Implementar validación de inputs en el módulo de autenticación para prevenir inyección SQL",
+        "success_criteria": [
+            "Todos los inputs del formulario de login son sanitizados",
+            "Tests unitarios cubren casos de inyección SQL",
+            "Snyk scan no reporta vulnerabilidades críticas"
+        ],
+        "affected_files": [
+            "src/auth/login.py",
+            "src/auth/validators.py",
+            "tests/test_auth.py"
+        ]
+    },
+    "pre_flight_check": {
+        "git_status": "clean",
+        "untracked_files": [],
+        "lint_passed": true,
+        "tests_passed": true
+    },
+    "steps": [
+        {
+            "id": "S01",
+            "action": "read_file",
+            "target": "src/auth/login.py",
+            "expected_outcome": "Entender estructura actual del módulo de login",
+            "hitl_required": false
+        },
+        {
+            "id": "S02",
+            "action": "lint_check",
+            "target": "src/auth/",
+            "expected_outcome": "Sin errores de sintaxis",
+            "depends_on": [
+                "S01"
+            ],
+            "hitl_required": false
+        },
+        {
+            "id": "S03",
+            "action": "write_file",
+            "target": "src/auth/validators.py",
+            "expected_outcome": "Nuevo módulo con funciones de validación",
+            "depends_on": [
+                "S02"
+            ],
+            "hitl_required": true,
+            "rollback": "git checkout src/auth/validators.py"
+        },
+        {
+            "id": "S04",
+            "action": "write_file",
+            "target": "src/auth/login.py",
+            "expected_outcome": "Login actualizado usando validators",
+            "depends_on": [
+                "S03"
+            ],
+            "hitl_required": true,
+            "rollback": "git checkout src/auth/login.py"
+        },
+        {
+            "id": "S05",
+            "action": "write_file",
+            "target": "tests/test_auth.py",
+            "expected_outcome": "Tests añadidos para casos de inyección",
+            "depends_on": [
+                "S04"
+            ],
+            "hitl_required": true
+        },
+        {
+            "id": "S06",
+            "action": "run_command",
+            "target": "pytest tests/test_auth.py -v",
+            "expected_outcome": "Todos los tests pasan",
+            "depends_on": [
+                "S05"
+            ],
+            "hitl_required": false
+        },
+        {
+            "id": "S07",
+            "action": "snyk_scan",
+            "target": "src/auth/",
+            "expected_outcome": "Sin vulnerabilidades críticas",
+            "depends_on": [
+                "S06"
+            ],
+            "hitl_required": false
+        },
+        {
+            "id": "S08",
+            "action": "git_commit",
+            "target": "src/auth/ tests/test_auth.py",
+            "expected_outcome": "Cambios commiteados",
+            "depends_on": [
+                "S07"
+            ],
+            "hitl_required": true
+        }
+    ],
+    "verification": {
+        "method": "automated",
+        "commands": [
+            "pytest tests/test_auth.py -v --tb=short",
+            "python scripts/lint_check.py src/auth/",
+            "python scripts/type_check.py src/auth/"
+        ],
+        "expected_results": [
+            "All tests passed",
+            "Lint check passed",
+            "Type check passed"
+        ]
+    },
+    "evidence": {
+        "logs": [],
+        "screenshots": [],
+        "test_results": {},
+        "analyzed_paths": [
+            "src/auth/login.py",
+            "src/auth/validators.py",
+            "tests/test_auth.py"
+        ]
+    },
+    "commit_proposal": {
+        "type": "feat",
+        "scope": "auth",
+        "message": "add input validation to prevent SQL injection in login module"
+    }
+}

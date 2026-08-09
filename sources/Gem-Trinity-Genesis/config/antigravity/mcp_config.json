@@ -1,0 +1,176 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "c:\\Users\\ASUS\\.gemini\\Antigravity Pro",
+        "c:\\Users\\ASUS\\.gemini\\Skills proyectos",
+        "c:\\Users\\ASUS\\.gemini\\Gem-Trinity-Genesis"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": true
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<REDACTED_GITHUB_TOKEN>",
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "notebooklm-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "notebooklm-mcp"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": true
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": false
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": true
+    },
+    "fetch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-fetch-typescript"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-docker"
+      ],
+      "env": {
+        "DOCKER_HOST": "ssh://ubuntu@100.69.240.73",
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "semgrep": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "ghcr.io/semgrep/mcp",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "DOCKER_HOST": "ssh://ubuntu@100.69.240.73",
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "rube": {
+      "command": "ssh",
+      "args": [
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "ConnectTimeout=10",
+        "ubuntu@100.69.240.73",
+        "COMPOSIO_API_KEY=ak_5HcMDiOabjPiFTx2XzyW",
+        "python3",
+        "/tmp/composio-mcp-server.py"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      }
+    },
+    "n8n-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init",
+        "-e",
+        "MCP_MODE=stdio",
+        "-e",
+        "LOG_LEVEL=error",
+        "-e",
+        "DISABLE_CONSOLE_OUTPUT=true",
+        "-e",
+        "N8N_API_URL=http://100.69.240.73:5678/api/v1",
+        "-e",
+        "N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0Y2Q4ODQ5Mi04YzUxLTQzYWEtYjdhZC05NWVmZDUzMjg1NzYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMjVhMzc2NTAtMDk2MC00YzJiLTk4YmQtYjcyMjc0MWNkYTE4IiwiaWF0IjoxNzcxMDk4NDUxLCJleHAiOjE3Nzg4MTc2MDB9.mEQT9iCYqFZIr5oCvzBPQopC4kSueEMwm5q-03OK_so",
+        "ghcr.io/czlonkowski/n8n-mcp:latest"
+      ],
+      "env": {
+        "DOCKER_HOST": "ssh://ubuntu@100.69.240.73",
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": true
+    },
+    "n8n-native": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "http://100.69.240.73:5678/rest/mcp",
+        "--header",
+        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0Y2Q4ODQ5Mi04YzUxLTQzYWEtYjdhZC05NWVmZDUzMjg1NzYiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMjVhMzc2NTAtMDk2MC00YzJiLTk4YmQtYjcyMjc0MWNkYTE4IiwiaWF0IjoxNzcxMDk4NDUxLCJleHAiOjE3Nzg4MTc2MDB9.mEQT9iCYqFZIr5oCvzBPQopC4kSueEMwm5q-03OK_so"
+      ],
+      "env": {
+        "HOME": "C:\\Users\\ASUS"
+      },
+      "disabled": true
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  },
+  "general": {
+    "previewFeatures": true,
+    "vimMode": true
+  },
+  "ui": {
+    "showMemoryUsage": false
+  }
+}

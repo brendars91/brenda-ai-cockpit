@@ -1,0 +1,210 @@
+{
+    "name": "[Example] AI Agent Workflow",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "ai-assistant",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-1",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                250,
+                300
+            ],
+            "webhookId": "ai-assistant-webhook"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Preparar contexto para el LLM\nconst userMessage = $json.message || $json.query || $json.text;\nconst conversationId = $json.conversationId || `conv-${Date.now()}`;\nconst userId = $json.userId || 'anonymous';\n\nif (!userMessage) {\n  throw new Error('No message provided');\n}\n\n// Construir prompt del sistema\nconst systemPrompt = `Eres un asistente de soporte técnico experto y amable.\n\nResponde de manera:\n- Clara y concisa\n- Profesional pero accesible\n- Con ejemplos prácticos cuando sea útil\n\nSi no sabes algo, sé honesto y sugiere alternativas.\nFormatea las respuestas con markdown cuando sea apropiado.`;\n\nreturn [{\n  json: {\n    conversationId,\n    userId,\n    userMessage,\n    systemPrompt,\n    timestamp: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "code-1",
+            "name": "Prepare Context",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                470,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "model": "gpt-4-turbo-preview",
+                "messages": {
+                    "values": [
+                        {
+                            "content": "={{ $json.systemPrompt }}",
+                            "role": "system"
+                        },
+                        {
+                            "content": "={{ $json.userMessage }}",
+                            "role": "user"
+                        }
+                    ]
+                },
+                "options": {
+                    "maxTokens": 1024,
+                    "temperature": 0.7
+                }
+            },
+            "id": "openai-1",
+            "name": "OpenAI Chat",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1.5,
+            "position": [
+                690,
+                300
+            ],
+            "credentials": {
+                "openAiApi": {
+                    "id": "openai-cred-id",
+                    "name": "OpenAI API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "// Procesar respuesta del LLM\nconst input = $('Prepare Context').first().json;\nconst llmResponse = $json.message?.content || $json.choices?.[0]?.message?.content || $json.content;\n\nif (!llmResponse) {\n  throw new Error('No response from LLM');\n}\n\n// Detectar si la respuesta parece incompleta\nconst isIncomplete = llmResponse.endsWith('...') || \n                     llmResponse.length > 900 && !llmResponse.endsWith('.');\n\nreturn [{\n  json: {\n    conversationId: input.conversationId,\n    userId: input.userId,\n    userMessage: input.userMessage,\n    response: llmResponse,\n    metadata: {\n      model: 'gpt-4-turbo-preview',\n      responseLength: llmResponse.length,\n      isIncomplete,\n      processedAt: new Date().toISOString()\n    }\n  }\n}];"
+            },
+            "id": "code-2",
+            "name": "Process Response",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                910,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "schema": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "public"
+                },
+                "table": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "conversations"
+                },
+                "columns": {
+                    "mappingMode": "defineBelow",
+                    "value": {
+                        "conversation_id": "={{ $json.conversationId }}",
+                        "user_id": "={{ $json.userId }}",
+                        "user_message": "={{ $json.userMessage }}",
+                        "assistant_response": "={{ $json.response }}",
+                        "metadata": "={{ JSON.stringify($json.metadata) }}",
+                        "created_at": "={{ $json.metadata.processedAt }}"
+                    }
+                }
+            },
+            "id": "postgres-1",
+            "name": "Log Conversation",
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.5,
+            "position": [
+                1130,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ {\n  \"success\": true,\n  \"conversationId\": $json.conversationId,\n  \"response\": $json.response,\n  \"metadata\": {\n    \"model\": $json.metadata.model,\n    \"timestamp\": $json.metadata.processedAt\n  }\n} }}",
+                "options": {
+                    "responseCode": 200,
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ]
+                    }
+                }
+            },
+            "id": "respond-1",
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                1130,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Context",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Context": {
+            "main": [
+                [
+                    {
+                        "node": "OpenAI Chat",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenAI Chat": {
+            "main": [
+                [
+                    {
+                        "node": "Process Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process Response": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Log Conversation",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "saveExecutionProgress": true,
+        "saveManualExecutions": true,
+        "executionTimeout": 60
+    },
+    "tags": [
+        {
+            "name": "example"
+        },
+        {
+            "name": "ai"
+        },
+        {
+            "name": "openai"
+        }
+    ]
+}

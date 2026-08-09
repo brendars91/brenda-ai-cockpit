@@ -1,0 +1,52 @@
+{
+    "comment": "Lista blanca de MCPs permitidos para Gem Builder Compiler (solo construcción, NO ejecución)",
+    "version": "1.0.0",
+    "allowed_mcps": [
+        {
+            "name": "filesystem",
+            "priority": "CRITICAL",
+            "usage": "Lectura de Use Case Specs desde specs/, escritura de Gem Bundles en bundles/, gestión de logs",
+            "trusted_paths": [
+                "C:\\Users\\ASUS\\.gemini\\Mis carpetas\\Gem Builder\\specs",
+                "C:\\Users\\ASUS\\.gemini\\Mis carpetas\\Gem Builder\\bundles",
+                "C:\\Users\\ASUS\\.gemini\\Mis carpetas\\Gem Builder\\logs"
+            ]
+        },
+        {
+            "name": "opa",
+            "priority": "CRITICAL",
+            "usage": "Motor de riesgo: evaluación de Use Case Specs contra políticas declarativas",
+            "policy_path": "C:\\Users\\ASUS\\.gemini\\Mis carpetas\\Gem Builder\\policies"
+        },
+        {
+            "name": "snyk",
+            "priority": "HIGH",
+            "usage": "Escaneo de seguridad de System Prompts generados para detectar prompt injection"
+        },
+        {
+            "name": "context7",
+            "priority": "MEDIUM",
+            "usage": "Grounding semántico para decisiones de Model Routing y Knowledge Planning"
+        },
+        {
+            "name": "fetch",
+            "priority": "MEDIUM",
+            "usage": "Acceso a URLs de documentación para grounding cuando el Use Case Spec lo requiere"
+        },
+        {
+            "name": "sequential-thinking",
+            "priority": "LOW",
+            "usage": "Razonamiento multi-step en fases complejas de compilación (opcional)"
+        }
+    ],
+    "explicitly_forbidden": [
+        "notion",
+        "google-drive",
+        "github",
+        "slack",
+        "n8n-native",
+        "n8n-mcp",
+        "playwright"
+    ],
+    "rationale": "Este es un COMPILADOR PURO. No ejecuta agents reales, solo genera artefactos JSON."
+}

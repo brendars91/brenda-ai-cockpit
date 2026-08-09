@@ -1,0 +1,51 @@
+name: Local Quality Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Sync backend
+        working-directory: backend
+        run: uv sync --frozen
+      - name: Test backend
+        working-directory: backend
+        run: uv run pytest tests --cov=cockpit_core --cov-report=term-missing
+      - name: Lint backend
+        working-directory: backend
+        run: uv run ruff check .
+      - name: Typecheck backend
+        working-directory: backend
+        run: uv run mypy cockpit_core
+
+  frontend:
+    name: Frontend TypeScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck frontend
+        run: pnpm --filter @cockpit/app typecheck
+      - name: Build frontend
+        run: pnpm --filter @cockpit/app build

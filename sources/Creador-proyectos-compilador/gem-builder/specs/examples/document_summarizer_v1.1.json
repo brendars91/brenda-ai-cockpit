@@ -1,0 +1,33 @@
+{
+    "use_case_id": "document_summarizer_v2",
+    "goal": "Resumir documentos de Google Drive en markdown estructurado con análisis de sentimiento",
+    "domain": "document-processing",
+    "data_sources": [
+        {
+            "type": "google-drive",
+            "path": "Drive/Projects",
+            "sensitivity": "internal",
+            "description": "Documentos de la carpeta Drive/Projects"
+        }
+    ],
+    "actions": [
+        {
+            "name": "summarize",
+            "description": "Generar resumen estructurado del documento con análisis de sentimiento",
+            "side_effects": false
+        },
+        {
+            "name": "export_markdown",
+            "description": "Exportar resultado como archivo markdown",
+            "side_effects": true
+        }
+    ],
+    "output": {
+        "format": "markdown",
+        "max_tokens": 1500
+    },
+    "constraints": {
+        "max_latency_ms": 8000,
+        "cost_tier": "high"
+    }
+}

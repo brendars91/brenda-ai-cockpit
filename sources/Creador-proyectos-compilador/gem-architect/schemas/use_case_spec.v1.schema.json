@@ -1,0 +1,238 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "UseCaseSpecV1",
+    "description": "Especificación de caso de uso para compilar un Gem Bundle",
+    "type": "object",
+    "required": [
+        "use_case_id",
+        "goal",
+        "data_sources",
+        "actions"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "use_case_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$",
+            "description": "Identificador único del caso de uso (solo minúsculas, números, guiones)",
+            "minLength": 3,
+            "maxLength": 50
+        },
+        "goal": {
+            "type": "string",
+            "description": "Objetivo del agente en lenguaje natural",
+            "minLength": 10,
+            "maxLength": 500
+        },
+        "domain": {
+            "type": "string",
+            "description": "Dominio del caso de uso (ej: finance, data-analysis, automation)",
+            "examples": [
+                "finance",
+                "data-analysis",
+                "automation",
+                "sap",
+                "api"
+            ]
+        },
+        "users": {
+            "type": "array",
+            "description": "Tipos de usuarios que interactuarán con el agente",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "end_user",
+                    "developer",
+                    "admin",
+                    "analyst"
+                ]
+            },
+            "minItems": 1
+        },
+        "data_sources": {
+            "type": "array",
+            "description": "Fuentes de datos que el agente necesita acceder",
+            "items": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "db",
+                            "api",
+                            "file",
+                            "drive",
+                            "notion",
+                            "url",
+                            "mcp"
+                        ],
+                        "description": "Tipo de fuente de datos"
+                    },
+                    "access": {
+                        "type": "string",
+                        "enum": [
+                            "read",
+                            "write",
+                            "read_write"
+                        ],
+                        "default": "read"
+                    },
+                    "sensitivity": {
+                        "type": "string",
+                        "enum": [
+                            "public",
+                            "internal",
+                            "confidential",
+                            "financial"
+                        ],
+                        "default": "internal",
+                        "description": "Nivel de sensibilidad de los datos"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción de la fuente de datos"
+                    }
+                }
+            },
+            "minItems": 1
+        },
+        "actions": {
+            "type": "array",
+            "description": "Acciones que el agente puede realizar",
+            "items": {
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "read",
+                            "analyze",
+                            "summarize",
+                            "transform",
+                            "execute",
+                            "write"
+                        ],
+                        "description": "Tipo de acción"
+                    },
+                    "side_effects": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Si la acción tiene efectos secundarios (modifica estado)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descripción de la acción"
+                    }
+                }
+            },
+            "minItems": 1
+        },
+        "output": {
+            "type": "object",
+            "description": "Formato de salida esperado",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "text",
+                        "json",
+                        "markdown",
+                        "html",
+                        "csv"
+                    ],
+                    "default": "text"
+                },
+                "schema": {
+                    "type": "object",
+                    "description": "JSON Schema del output (si type=json)"
+                }
+            }
+        },
+        "constraints": {
+            "type": "object",
+            "description": "Restricciones del caso de uso",
+            "properties": {
+                "latency_ms": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "maximum": 60000,
+                    "default": 5000,
+                    "description": "Latencia máxima permitida en milisegundos"
+                },
+                "cost_tier": {
+                    "type": "string",
+                    "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                    ],
+                    "default": "medium",
+                    "description": "Tier de costo aceptable"
+                },
+                "max_tokens": {
+                    "type": "integer",
+                    "minimum": 100,
+                    "description": "Tokens máximos en respuesta"
+                }
+            }
+        },
+        "security": {
+            "type": "object",
+            "description": "Configuración de seguridad",
+            "properties": {
+                "hitl_required": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "always",
+                        "never"
+                    ],
+                    "default": "auto",
+                    "description": "Cuándo requiere Human-in-the-Loop"
+                },
+                "allowed_tools": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Lista blanca de MCPs/tools permitidos"
+                },
+                "read_only": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Si el agente solo puede leer (sin writes)"
+                }
+            }
+        },
+        "grounding": {
+            "type": "object",
+            "description": "Estrategia de grounding para facts",
+            "properties": {
+                "required": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Si requiere grounding obligatorio"
+                },
+                "sources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "google_search",
+                            "context7",
+                            "rag",
+                            "knowledge_base"
+                        ]
+                    },
+                    "description": "Fuentes de grounding permitidas"
+                }
+            }
+        }
+    }
+}

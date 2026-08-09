@@ -1,0 +1,386 @@
+# Master Spec Unificado — Gem Builder (Factoría de Gems)
+**Arquitectura Maestra, Compilador Determinista, Orquestación Cognitiva y Anti-Alucinación
+Operativa**
+**Edición:** 30 diciembre 2025
+**Versión:** Unificada Completa y Cerrada (Consolidación de Reportes 1–3)
+---
+## 0. Resumen ejecutivo
+Este documento define la arquitectura técnica **end-to-end** para construir un **Gem
+Builder**: un **meta-agente** cuya función no es “chatear” ni “escribir prompts”, sino
+**compilar, validar y desplegar otros agentes (Gems)** dentro del ecosistema Google.
+### Tesis central
+- El Gem Builder **no escribe prompts**.
+- El Gem Builder **compila agentes como artefactos de software**: versionables, medibles,
+auditables y reversibles.
+### Entregable obligatorio del Builder
+Cada Gem generada debe salir como un **paquete operativo completo (Gem Bundle)** con:
+- selección y *routing* de modelo (Gemini 3 Pro / Flash u otros),
+- políticas anti-alucinación ejecutables,
+- contratos de herramientas (MCP),
+- estrategia de grounding / RAG,
+- verificación dura (schema + grounding + seguridad),
+- observabilidad,
+- gobernanza de seguridad,
+- suite de evaluación (*golden set* + *edge cases* + ataques).
+---
+## 1. Propósito y alcance
+### 1.1 Propósito
+Diseñar un sistema de compilación que transforme solicitudes humanas en **Gems
+específicas listas para ejecutar**, con seguridad y verificabilidad.
+### 1.2 Alcance
+Incluye:
+- normalización de *intake* (petición → especificación estructurada),
+- motor de riesgo con políticas automáticas,
+- *routing* de modelo por condiciones observables,
+- planificación de herramientas (Search / URL / RAG / Code / MCP / APIs),
+- compilación de prompts y políticas como artefactos versionados,
+- verificador / *gate* final (schema + grounding + seguridad + “no entidades fantasma”),
+- empaquetado del Gem Bundle,
+
+- ejecución en rutas soportadas (Workspace / Gemini CLI / Vertex + ADK / otros runtimes
+compatibles).
+---
+## 2. Principios arquitectónicos fundamentales
+### 2.1 Zero-Trust Cognitivo
+El LLM **no es fuente de verdad**. Es un componente que debe:
+- verificar,
+- ejecutar,
+- citar / *groundear*,
+- o declarar ignorancia (`FALTAN_DATOS`).
+### 2.2 Anti-alucinación por diseño (no por prompting)
+La veracidad no se “pide”; se **impone** mediante:
+- grounding (Search / URL context / RAG),
+- ejecución de código (Python sandbox u otro runtime),
+- contratos de herramientas,
+- validación independiente (Verifier Gate),
+- control explícito de efectos secundarios (*side-effects*).
+### 2.3 Separación estricta de responsabilidades
+Ningún agente complejo puede planificar, actuar y validarse sin **controles explícitos y
+medibles**.
+### 2.4 Todo es versionable, medible y reversible
+Prompts, decisiones, tools y outputs se tratan como artefactos de software, con:
+- versionado (hash / semver),
+- métricas,
+- pruebas,
+- *rollback*.
+---
+## 3. Arquitectura global del ecosistema (vista completa)
+### 3.1 Vista completa (conceptual)
+[ Usuario / Sistema ] ↓ [ Intake Normalizer ] → convierte la petición a Use Case Spec
+(estructurado) ↓ [ Gem Builder Compiler ] ├─ Risk Engine (score + políticas) ├─ Model
+Router (Pro / Flash u otros) ├─ Tool Planner (MCP / API / Search / RAG / Code) ├─ Prompt
+/ Policy Compiler └─ Verifier Gate (schema + grounding + seguridad) ↓ [ Gem Bundle
+(artefactos) ] ↓ [ Runtime elegido: Workspace / Gemini CLI / Vertex+ADK / Otro ] ↓ [ MCP
+Servers / APIs / Sistemas / DB / FS ]
+Copiar código
+### 3.2 Capas destacadas del ecosistema
+- **Gem Builder:** compilador y orquestador determinista.
+
+- **Antigravity:** capa superior de coordinación cognitiva (estado y flujos).
+- **ADK / Agentes:** implementación de roles como componentes evaluables (cuando
+aplique).
+- **Gemini CLI:** runtime de referencia para ejecución controlada con MCP.
+- **MCP Servers:** integración con sistemas / APIs / DB / FS mediante contratos.
+---
+## 4. El núcleo del Builder: pipeline determinista
+El Gem Builder opera como un **pipeline determinista**; lo variable es el **Use Case
+Spec**, no el “estilo” del prompt.
+### 4.1 Paso 1 — Intake → Use Case Spec (obligatorio)
+El Builder no empieza a compilar hasta tener un spec completo, o devuelve
+`FALTAN_DATOS` y pregunta lo mínimo imprescindible.
+**Formato recomendado (mínimo viable):**
+```json
+{
+"use_case_id": "string",
+"goal": "string",
+"users": ["end_user|admin|system"],
+"data_sources": [
+{
+"type": "drive|docs|url|api|mcp|db",
+"access": "read|write",
+"sensitivity": "low|pii|financial|legal|medical"
+}
+],
+"actions": [
+{
+"type": "summarize|extract|classify|generate|execute",
+"side_effects": false
+}
+],
+"output": {
+"type": "markdown|json",
+"json_schema_required": true
+},
+"constraints": {
+"latency_ms": 20000,
+"cost_tier": "low|medium|high"
+},
+"security": {
+"hitl_required": "auto",
+
+"allowed_tools": ["..."],
+"blocked_tools": ["..."]
+}
+}
+4.2 Paso 2 — Risk Engine (score 0–100) + políticas automáticas
+Señales típicas de ALTO riesgo
+PII / finanzas / legal / médico,
+escritura / borrado / modificación de sistemas,
+impacto económico o legal directo.
+Acciones automáticas ante riesgo alto
+activar Model Armor,
+activar detección de prompt injection (directa e indirecta),
+activar redacción / anonimización si aplica,
+forzar HITL (Human-in-the-Loop),
+tools en read-only y dry_run por defecto,
+allowlist estricta y verificación reforzada.
+Riesgo bajo
+filtros estándar,
+tools en modo lectura por defecto,
+verificación normal.
+4.3 Paso 3 — Model Router (routing por condiciones observables)
+El routing es un algoritmo, no un prompt.
+Condición observable
+Modelo sugerido
+razonamiento profundo, planificación, coding complejo
+Gemini 3 Pro
+conversación, extracción, clasificación, borradores
+Gemini 3 Flash
+Nota de actualización (diciembre 2025)
+La distinción Pro / Flash ha evolucionado: Flash puede rendir muy alto en tareas de coding.
+ASUNCIÓN (dato volátil): menciones concretas de benchmarks (p. ej. “78% SWE-bench
+Verified”) deben tratarse como volátiles y requerir grounding si se exponen como hechos en
+salida.
+4.4 Paso 4 — Tool Planner (planificación de herramientas)
+Selección estricta por necesidad:
+Necesidad
+Herramienta
+datos actuales / post-cutoff
+Google Search Grounding o URL Context
+cálculo exacto / simulación
+Code Execution (Python sandbox)
+sistemas internos / archivos
+MCP
+side-effects (escritura, borrado)
+MCP + HITL + Dry-Run
+4.5 Paso 5 — Prompt / Policy Compiler (artefactos versionados)
+Compila:
+system prompt (texto + versión),
+
+políticas anti-alucinación,
+reglas de routing,
+restricciones de herramientas,
+contratos de salida (Output Contracts).
+4.6 Paso 6 — Verifier Gate (bloqueo duro)
+Valida obligatoriamente:
+schema (si JSON),
+grounding / citas cuando aplique,
+seguridad / políticas (Model Armor, allowlist, etc.),
+coherencia interna,
+inexistencia de “entidades fantasma”.
+Regla: si falla schema / grounding / política ⇒ rechazar output o devolver parcial verificado
++ preguntas.
+5. Output Contracts y Structured Outputs
+5.1 Regla general
+Las salidas críticas deben ser:
+parseables,
+validadas por esquema,
+consistentes con contratos.
+5.2 Estrategia de salida
+Integración sistémica → JSON Schema estricto.
+Consumo humano → Markdown estructurado.
+Casos críticos → salida en dos capas:
+result
+verification
+5.3 Structured Outputs (Gemini API)
+response_mime_type: application/json
+response_json_schema
+Nota operativa: reduce fricción si un downstream system requiere orden estable de claves.
+6. Protocolo anti-alucinación (normativa ejecutable)
+6.1 Estados de conocimiento obligatorios
+HECHO_VERIFICADO
+INFERENCIA
+ASUNCIÓN
+FALTAN_DATOS
+6.2 Reglas inviolables
+Prohibición de entidades fantasma.
+Datos volátiles ⇒ grounding obligatorio o ASUNCIÓN.
+Fallo seguro: ante duda, FALTAN_DATOS o output parcial verificado.
+7. Arquitectura multi-agente robusta (roles lógicos)
+Roles:
+Planner: define pasos y criterios de aceptación.
+Retriever: decide grounding y fuentes permitidas.
+Executor: ejecuta tools (MCP, APIs, code sandbox).
+Verifier: valida schema, grounding, políticas y entidades fantasma.
+En ADK, los roles se implementan como componentes evaluables.
+8. Antigravity: capa de orquestación cognitiva (emergente)
+8.1 Rol arquitectónico
+
+Capa superior para:
+orquestación multi-agente persistente,
+gestión de estado estructurado,
+reducción de prompt-bloat,
+flujos cognitivos más claros.
+8.2 Reglas de uso seguro
+Antigravity NO es memoria de verdad.
+Todo estado pasa por tools y Verifier.
+9. Gemini CLI: runtime de referencia
+9.1 Regla arquitectónica
+Obligatoria con MCP para:
+sandbox local,
+ejecución MCP vía stdio,
+confirmación humana (Y/n),
+observabilidad de tool-calls,
+gestión real de secretos y entorno.
+9.2 Principio operativo
+Ninguna Gem con escritura es válida sin validarse en Gemini CLI.
+10. MCP en producción
+10.1 Contratos de herramientas
+Cada tool declara:
+input / output schema,
+errores esperables,
+timeouts,
+rate limits,
+idempotency_key,
+dry_run=true por defecto si hay side-effects.
+10.2 Seguridad MCP
+read-only por defecto,
+separación dev / stage / prod,
+secretos fuera de prompts y repos.
+10.3 Configuración en Gemini CLI
+Campos típicos en settings.json → mcpServers: command, args, env, cwd, timeout, trust.
+Postura segura: trust: false por defecto.
+11. Seguridad avanzada y failure modes
+11.1 Model Armor
+Para:
+protección de datos sensibles,
+detección de prompt injection,
+screening de tool-calls y outputs,
+sanitización.
+11.2 Failure Modes
+Evento
+Acción
+grounding falla
+devolver FALTAN_DATOS
+Model Armor bloquea
+error controlado + alternativa segura
+
+token limit
+resumir y continuar
+MCP timeout
+reintento idempotente
+schema inválido
+rechazar / regenerar bajo contrato
+side-effects sin confirmación
+bloquear y forzar HITL / dry-run
+12. Observabilidad y coste
+12.1 Métricas mínimas
+tokens input / output,
+latencia p50 / p95,
+coste por tarea,
+grounding rate,
+tool-call rate y success rate,
+validation fail rate,
+drift de routing (Pro / Flash).
+12.2 Presupuestos cognitivos
+límite de contexto,
+resumen automático,
+degradación Pro → Flash,
+caching cuando aplique.
+13. Paquete de despliegue (Gem Bundle)
+13.1 Estructura de referencia
+Copiar código
+Json
+{
+"bundle_meta": {
+"version": "1.0.0",
+"created_at": "ISO-8601",
+"use_case_id": "..."
+},
+"model_routing": {
+"default_model": "...",
+"rules": [{ "if": "...", "then": "..." }]
+},
+"policies": {
+"knowledge_states": [
+"HECHO_VERIFICADO",
+"INFERENCIA",
+"ASUNCION",
+"FALTAN_DATOS"
+],
+"forbidden": ["entidades_fantasma"]
+},
+"tools": {
+"contracts": [
+{
+
+"name": "...",
+"input_schema": {},
+"timeouts_ms": 30000,
+"idempotency_key_required": true,
+"dry_run_default": true
+}
+]
+},
+"knowledge_plan": {
+"grounding": "search|url|rag|none",
+"allowed_sources": ["..."]
+},
+"system_prompt": {
+"text": "...",
+"version": "hash/semver"
+},
+"verifier": {
+"checks": ["schema", "grounding", "security", "ghost_entities"]
+},
+"observability": {
+"metrics": [
+"tokens",
+"latency_p50",
+"grounding_rate",
+"tool_success_rate",
+"validation_fail_rate"
+]
+},
+"eval_suite": {
+"golden_set": [],
+"edge_cases": [],
+"attacks": []
+}
+}
+13.2 Checklist obligatorio
+system prompt versionado,
+política anti-alucinación,
+routing de modelo,
+tool plan,
+knowledge plan,
+output contracts,
+eval suite,
+checklist de seguridad,
+telemetría.
+14. Rutas de implementación (solo Google)
+Ruta A — Gemini App / Workspace
+Builder como Gem,
+grounding con Docs / Drive / URLs,
+
+productividad individual y equipos.
+Ruta B — Gemini CLI + MCP
+sandbox local,
+control humano,
+validación segura de side-effects.
+Ruta C — Vertex AI + ADK + MCP
+agentes como software,
+roles evaluables,
+observabilidad y gobernanza,
+Model Armor,
+CI/CD.
+15. Conclusión
+El Gem Builder es infraestructura cognitiva, no un prompt avanzado.
+Convierte la creación de Gems en un proceso:
+determinista,
+verificable,
+seguro,
+escalable,
+alineado con ingeniería de software real.
+Quien implemente este diseño no crea asistentes.
+Crea una cadena de suministro de agentes confiables.

@@ -1,0 +1,275 @@
+{
+    "name": "[Example] Data Transformation ETL",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 6 * * *"
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-1",
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://api.example.com/v1/orders",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "httpHeaderAuth",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "since",
+                            "value": "={{ $now.minus({days: 1}).toISO() }}"
+                        },
+                        {
+                            "name": "status",
+                            "value": "completed"
+                        }
+                    ]
+                },
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "json"
+                        }
+                    }
+                }
+            },
+            "id": "http-1",
+            "name": "Fetch Orders",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                470,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Transformar datos de ordenes\nconst orders = $json.data || $json.orders || $json;\n\nif (!Array.isArray(orders)) {\n  return [{ json: orders }];\n}\n\n// Procesar cada orden\nreturn orders.map(order => ({\n  json: {\n    // IDs\n    orderId: order.id,\n    customerId: order.customer?.id || order.customerId,\n    \n    // Datos del cliente\n    customerName: `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim(),\n    customerEmail: order.customer?.email?.toLowerCase(),\n    \n    // Productos\n    itemCount: order.items?.length || 0,\n    productIds: order.items?.map(i => i.productId) || [],\n    \n    // Financiero\n    subtotal: order.items?.reduce((sum, i) => sum + (i.price * i.quantity), 0) || 0,\n    tax: order.tax || 0,\n    shipping: order.shipping || 0,\n    total: order.total,\n    currency: order.currency || 'USD',\n    \n    // Fechas (normalizadas a ISO)\n    orderedAt: order.createdAt || order.orderDate,\n    processedAt: new Date().toISOString(),\n    \n    // Metadata\n    source: order.source || 'api',\n    region: order.shippingAddress?.country || 'unknown'\n  }\n}));"
+            },
+            "id": "code-1",
+            "name": "Transform Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                690,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "leftValue": "",
+                        "caseSensitive": true,
+                        "typeValidation": "strict"
+                    },
+                    "combinator": "and",
+                    "conditions": [
+                        {
+                            "leftValue": "={{ $json.total }}",
+                            "rightValue": 0,
+                            "operator": {
+                                "type": "number",
+                                "operation": "gt"
+                            }
+                        },
+                        {
+                            "leftValue": "={{ $json.customerEmail }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "isNotEmpty"
+                            }
+                        }
+                    ]
+                }
+            },
+            "id": "filter-1",
+            "name": "Filter Valid",
+            "type": "n8n-nodes-base.filter",
+            "typeVersion": 2,
+            "position": [
+                910,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "destinationFieldName": "orders",
+                "options": {}
+            },
+            "id": "aggregate-1",
+            "name": "Aggregate",
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                1130,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Calcular estadísticas\nconst orders = $json.orders || [];\n\nconst stats = {\n  totalOrders: orders.length,\n  totalRevenue: orders.reduce((sum, o) => sum + o.total, 0),\n  avgOrderValue: orders.length > 0 ? orders.reduce((sum, o) => sum + o.total, 0) / orders.length : 0,\n  uniqueCustomers: new Set(orders.map(o => o.customerId)).size,\n  byRegion: {},\n  byCurrency: {},\n  processedAt: new Date().toISOString()\n};\n\n// Agrupar por región\norders.forEach(o => {\n  stats.byRegion[o.region] = (stats.byRegion[o.region] || 0) + 1;\n  stats.byCurrency[o.currency] = (stats.byCurrency[o.currency] || 0) + o.total;\n});\n\nreturn [{\n  json: {\n    date: $now.toFormat('yyyy-MM-dd'),\n    stats,\n    orders\n  }\n}];"
+            },
+            "id": "code-2",
+            "name": "Calculate Stats",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1350,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "insert",
+                "schema": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "public"
+                },
+                "table": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "daily_reports"
+                },
+                "columns": {
+                    "mappingMode": "autoMapInputData",
+                    "value": {
+                        "date": "={{ $json.date }}",
+                        "stats": "={{ JSON.stringify($json.stats) }}",
+                        "order_count": "={{ $json.stats.totalOrders }}",
+                        "total_revenue": "={{ $json.stats.totalRevenue }}"
+                    }
+                }
+            },
+            "id": "postgres-1",
+            "name": "Save to DB",
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.5,
+            "position": [
+                1570,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "channel": "#daily-reports",
+                "text": "=📊 *Daily Orders Report - {{ $json.date }}*\n\n• Orders: {{ $json.stats.totalOrders }}\n• Revenue: ${{ $json.stats.totalRevenue.toFixed(2) }}\n• Avg Order: ${{ $json.stats.avgOrderValue.toFixed(2) }}\n• Unique Customers: {{ $json.stats.uniqueCustomers }}",
+                "otherOptions": {}
+            },
+            "id": "slack-1",
+            "name": "Notify Slack",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 2.2,
+            "position": [
+                1570,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Orders",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Orders": {
+            "main": [
+                [
+                    {
+                        "node": "Transform Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Transform Data": {
+            "main": [
+                [
+                    {
+                        "node": "Filter Valid",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter Valid": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "Calculate Stats",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Calculate Stats": {
+            "main": [
+                [
+                    {
+                        "node": "Save to DB",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Notify Slack",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "saveExecutionProgress": true,
+        "saveManualExecutions": true,
+        "executionTimeout": 300
+    },
+    "tags": [
+        {
+            "name": "example"
+        },
+        {
+            "name": "etl"
+        },
+        {
+            "name": "scheduled"
+        }
+    ]
+}

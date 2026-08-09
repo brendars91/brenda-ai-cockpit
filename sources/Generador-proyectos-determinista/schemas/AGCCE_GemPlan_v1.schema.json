@@ -1,0 +1,179 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AGCCE GemPlan v1",
+    "description": "Plan de ejecución de AGCCE extendido con configuración desde Gem Bundle",
+    "type": "object",
+    "required": [
+        "plan_id",
+        "goal",
+        "tasks",
+        "gem_configuration",
+        "schema_version"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "plan_id": {
+            "type": "string",
+            "description": "ID único del plan (ej: gemplan_sap_cost_analyzer_001)"
+        },
+        "goal": {
+            "type": "string",
+            "description": "Objetivo que el usuario quiere lograr"
+        },
+        "tasks": {
+            "type": "array",
+            "description": "Tareas a ejecutar por el MAS de AGCCE",
+            "items": {
+                "type": "object",
+                "required": [
+                    "agent",
+                    "action"
+                ],
+                "properties": {
+                    "agent": {
+                        "enum": [
+                            "researcher",
+                            "architect",
+                            "constructor",
+                            "auditor",
+                            "tester"
+                        ],
+                        "description": "Agente MAS responsable de esta tarea"
+                    },
+                    "action": {
+                        "type": "string",
+                        "description": "Acción específica a realizar"
+                    },
+                    "context": {
+                        "type": "string",
+                        "description": "Contexto adicional para la tarea"
+                    },
+                    "output_path": {
+                        "type": "string",
+                        "description": "Path donde guardar el output (si aplica)"
+                    },
+                    "dependencies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "IDs de tareas de las que depende esta"
+                    },
+                    "timeout_ms": {
+                        "type": "integer",
+                        "minimum": 1000,
+                        "description": "Timeout en milisegundos"
+                    }
+                }
+            }
+        },
+        "gem_configuration": {
+            "type": "object",
+            "required": [
+                "gem_bundle_path",
+                "gem_version",
+                "gem_use_case_id"
+            ],
+            "properties": {
+                "gem_bundle_path": {
+                    "type": "string",
+                    "description": "Path relativo al Gem Bundle (ej: gems/sap_cost_analyzer_v1.0.0.json)"
+                },
+                "gem_version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+\\.\\d+$",
+                    "description": "Versión SemVer del Gem Bundle"
+                },
+                "gem_use_case_id": {
+                    "type": "string",
+                    "description": "ID del caso de uso del Gem"
+                },
+                "risk_score": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Risk Score del Gem (del Risk Engine)"
+                },
+                "agent_overrides": {
+                    "type": "object",
+                    "description": "Qué configuración usar del Gem vs defaults de AGCCE",
+                    "properties": {
+                        "system_prompt_source": {
+                            "enum": [
+                                "gem",
+                                "default",
+                                "hybrid"
+                            ],
+                            "default": "gem",
+                            "description": "gem: usa prompt del Gem, default: usa prompt hardcoded, hybrid: combina ambos"
+                        },
+                        "model_source": {
+                            "enum": [
+                                "gem",
+                                "default"
+                            ],
+                            "default": "gem",
+                            "description": "Modelo a usar (del Gem o default de AGCCE)"
+                        },
+                        "policies_source": {
+                            "enum": [
+                                "gem",
+                                "default",
+                                "strictest"
+                            ],
+                            "default": "strictest",
+                            "description": "Políticas de seguridad (strictest toma las más estrictas)"
+                        },
+                        "mcps_source": {
+                            "enum": [
+                                "gem",
+                                "default",
+                                "intersection"
+                            ],
+                            "default": "intersection",
+                            "description": "MCPs permitidos (intersection = solo los comunes)"
+                        }
+                    }
+                },
+                "enable_gem_validation": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Validar Gem contra schema antes de ejecutar"
+                }
+            }
+        },
+        "constraints": {
+            "type": "object",
+            "description": "Restricciones globales del plan",
+            "properties": {
+                "max_execution_time_ms": {
+                    "type": "integer",
+                    "description": "Tiempo máximo de ejecución total"
+                },
+                "require_hitl": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Forzar HITL incluso si Gem no lo requiere"
+                },
+                "dry_run": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Modo dry-run (no escribe archivos reales)"
+                }
+            }
+        },
+        "schema_version": {
+            "const": "AGCCE_GemPlan_v1",
+            "description": "Versión del schema de GemPlan"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de creación del plan (UTC ISO-8601)"
+        },
+        "created_by": {
+            "type": "string",
+            "description": "Quién creó el plan (usuario o sistema)"
+        }
+    }
+}

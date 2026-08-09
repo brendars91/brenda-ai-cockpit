@@ -1,0 +1,2 @@
+pnpm --filter @cockpit/app typecheck
+cd backend && uv run pytest tests -q

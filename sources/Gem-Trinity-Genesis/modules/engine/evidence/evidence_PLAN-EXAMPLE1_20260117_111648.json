@@ -1,0 +1,125 @@
+{
+  "plan_id": "PLAN-EXAMPLE1",
+  "plan_version": "1.1",
+  "collected_at": "2026-01-17T11:16:47.223525",
+  "collector_version": "1.0.0",
+  "git_info": {
+    "current_branch": "master",
+    "status": "dirty",
+    "changed_files": [
+      "?? .hitl_approvals.json"
+    ]
+  },
+  "files_analyzed": [
+    {
+      "path": "tests/test_auth.py",
+      "exists": false
+    },
+    {
+      "path": "src/auth/validators.py",
+      "exists": false
+    },
+    {
+      "path": "src/auth/login.py",
+      "exists": false
+    }
+  ],
+  "verification_results": [
+    {
+      "command": "pytest tests/test_auth.py -v --tb=short",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "\"pytest\" no se reconoce como un comando interno o externo,\nprograma o archivo por lotes ejecutable.\n",
+      "success": false,
+      "executed_at": "2026-01-17T11:16:47.860899"
+    },
+    {
+      "command": "python scripts/lint_check.py src/auth/",
+      "exit_code": 1,
+      "stdout": "\u001b[91mError: 'src/auth/' no existe\u001b[0m\n",
+      "stderr": "",
+      "success": false,
+      "executed_at": "2026-01-17T11:16:48.339311"
+    },
+    {
+      "command": "python scripts/type_check.py src/auth/",
+      "exit_code": 1,
+      "stdout": "\u001b[91mError: 'src/auth/' no existe\u001b[0m\n",
+      "stderr": "",
+      "success": false,
+      "executed_at": "2026-01-17T11:16:48.603449"
+    }
+  ],
+  "steps_summary": [
+    {
+      "id": "S01",
+      "action": "read_file",
+      "target": "src/auth/login.py",
+      "hitl_required": false,
+      "expected_outcome": "Entender estructura actual del módulo de login"
+    },
+    {
+      "id": "S02",
+      "action": "lint_check",
+      "target": "src/auth/",
+      "hitl_required": false,
+      "expected_outcome": "Sin errores de sintaxis"
+    },
+    {
+      "id": "S03",
+      "action": "write_file",
+      "target": "src/auth/validators.py",
+      "hitl_required": true,
+      "expected_outcome": "Nuevo módulo con funciones de validación"
+    },
+    {
+      "id": "S04",
+      "action": "write_file",
+      "target": "src/auth/login.py",
+      "hitl_required": true,
+      "expected_outcome": "Login actualizado usando validators"
+    },
+    {
+      "id": "S05",
+      "action": "write_file",
+      "target": "tests/test_auth.py",
+      "hitl_required": true,
+      "expected_outcome": "Tests añadidos para casos de inyección"
+    },
+    {
+      "id": "S06",
+      "action": "run_command",
+      "target": "pytest tests/test_auth.py -v",
+      "hitl_required": false,
+      "expected_outcome": "Todos los tests pasan"
+    },
+    {
+      "id": "S07",
+      "action": "snyk_scan",
+      "target": "src/auth/",
+      "hitl_required": false,
+      "expected_outcome": "Sin vulnerabilidades críticas"
+    },
+    {
+      "id": "S08",
+      "action": "git_commit",
+      "target": "src/auth/ tests/test_auth.py",
+      "hitl_required": true,
+      "expected_outcome": "Cambios commiteados"
+    }
+  ],
+  "commit_proposal": {
+    "type": "feat",
+    "scope": "auth",
+    "message": "add input validation to prevent SQL injection in login module"
+  },
+  "plan_validation": {
+    "passed": true,
+    "output": "\n\u001b[1m============================================================\n  AGCCE Plan Validator v1.1.0\n============================================================\u001b[0m\n\n\u001b[94m[i] INFO:\u001b[0m Validando: examples/example_plan_auth_fix.json\n\n\n\u001b[92m[OK] PASS:\u001b[0m Plan valido segun AGCCE_Plan_v1 schema\n\n\u001b[92m=== VALIDATION PASSED ===\u001b[0m\n\n"
+  },
+  "evidence_score": {
+    "verification_passed": false,
+    "plan_valid": true,
+    "overall": "FAIL"
+  }
+}

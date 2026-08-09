@@ -1,0 +1,6 @@
+# Reference parent requirements
+-r ../requirements.in
+
+# Testing (local-watcher only)
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

@@ -1,0 +1,219 @@
+{
+    "_version": "3.0.0-LITE",
+    "_description": "Skill Manifest - Define qué herramientas usar en cada fase del proyecto",
+    "_updated": "2026-01-17",
+    "mcps": {
+        "active": {
+            "context7": {
+                "description": "Documentación actualizada de librerías",
+                "phases": [
+                    "research",
+                    "planning"
+                ],
+                "priority": "low",
+                "use_when": "Usuario pregunta sobre APIs o librerías externas"
+            },
+            "filesystem": {
+                "description": "Operaciones de archivos (leer, escribir, mover)",
+                "phases": [
+                    "all"
+                ],
+                "priority": "high",
+                "use_when": "Siempre disponible - operaciones CRUD de archivos"
+            },
+            "snyk": {
+                "description": "Escaneo de seguridad de código y dependencias",
+                "phases": [
+                    "validation",
+                    "pre-commit",
+                    "security-audit"
+                ],
+                "priority": "critical",
+                "use_when": "Antes de commits, al revisar código nuevo, auditorías"
+            },
+            "sequential-thinking": {
+                "description": "Razonamiento estructurado paso a paso",
+                "phases": [
+                    "planning",
+                    "analysis",
+                    "debugging"
+                ],
+                "priority": "medium",
+                "use_when": "Problemas complejos que requieren descomposición"
+            },
+            "smart-coding-mcp": {
+                "description": "Búsqueda semántica RAG en codebase",
+                "phases": [
+                    "analysis",
+                    "search",
+                    "refactoring"
+                ],
+                "priority": "high",
+                "use_when": "Buscar código, entender arquitectura, encontrar dependencias"
+            },
+            "n8n-native": {
+                "description": "Automatización con n8n workflows",
+                "phases": [
+                    "automation",
+                    "integration"
+                ],
+                "priority": "medium",
+                "use_when": "Crear/ejecutar workflows, webhooks, automatizaciones"
+            },
+            "fetch": {
+                "description": "HTTP requests a URLs externas",
+                "phases": [
+                    "research",
+                    "integration"
+                ],
+                "priority": "low",
+                "use_when": "Obtener contenido de URLs, APIs externas"
+            }
+        },
+        "toggle_as_needed": {
+            "_note": "Todos funcionan. Usuario los activa/desactiva en mcp_config.json según necesidad (límite 50 tools)",
+            "playwright": {
+                "description": "Automatización de navegador",
+                "activate_for": [
+                    "testing",
+                    "scraping",
+                    "ui-automation",
+                    "browser-tasks"
+                ],
+                "tools_count": "~15 tools"
+            },
+            "github": {
+                "description": "API de GitHub (repos, issues, PRs)",
+                "activate_for": [
+                    "github-integration",
+                    "ci-cd",
+                    "repo-management"
+                ],
+                "tools_count": "~20 tools"
+            },
+            "docker": {
+                "description": "Gestión de contenedores Docker",
+                "activate_for": [
+                    "containerization",
+                    "devops",
+                    "docker-compose"
+                ],
+                "tools_count": "~10 tools"
+            },
+            "semgrep": {
+                "description": "Análisis estático avanzado",
+                "activate_for": [
+                    "deep-security-audit",
+                    "code-quality"
+                ],
+                "tools_count": "~5 tools"
+            },
+            "mcp-sbom": {
+                "description": "Generación de SBOM",
+                "activate_for": [
+                    "compliance",
+                    "security-audit",
+                    "dependency-analysis"
+                ],
+                "tools_count": "~5 tools"
+            },
+            "opa": {
+                "description": "Open Policy Agent - políticas como código",
+                "activate_for": [
+                    "policy-enforcement",
+                    "compliance",
+                    "authorization"
+                ],
+                "tools_count": "~5 tools"
+            },
+            "n8n-mcp": {
+                "description": "n8n Docker (alternativa a n8n-native)",
+                "activate_for": [
+                    "n8n-docker-mode"
+                ],
+                "tools_count": "~10 tools"
+            }
+        }
+    },
+    "phases": {
+        "analysis": {
+            "description": "Analizar código existente y entender arquitectura",
+            "primary_tools": [
+                "smart-coding-mcp",
+                "filesystem"
+            ],
+            "secondary_tools": [
+                "sequential-thinking"
+            ],
+            "cli_suggestion": "Opción [1] - Indexar primero si hay cambios recientes"
+        },
+        "planning": {
+            "description": "Diseñar solución y crear plan",
+            "primary_tools": [
+                "sequential-thinking",
+                "context7"
+            ],
+            "secondary_tools": [
+                "smart-coding-mcp"
+            ],
+            "cli_suggestion": "Opción [2] o [7] - Generar plan o usar template"
+        },
+        "implementation": {
+            "description": "Escribir código y hacer cambios",
+            "primary_tools": [
+                "filesystem",
+                "smart-coding-mcp"
+            ],
+            "secondary_tools": [],
+            "cli_suggestion": null
+        },
+        "validation": {
+            "description": "Verificar código, tests, seguridad",
+            "primary_tools": [
+                "snyk",
+                "filesystem"
+            ],
+            "secondary_tools": [],
+            "cli_suggestion": "Opción [5] - Escanear seguridad"
+        },
+        "pre-commit": {
+            "description": "Checks antes de commit",
+            "primary_tools": [
+                "snyk"
+            ],
+            "secondary_tools": [],
+            "cli_suggestion": "Opción [5] - OBLIGATORIO antes de commit"
+        },
+        "automation": {
+            "description": "Crear workflows y automatizaciones",
+            "primary_tools": [
+                "n8n-native",
+                "filesystem"
+            ],
+            "secondary_tools": [],
+            "cli_suggestion": null
+        },
+        "research": {
+            "description": "Investigar librerías, APIs, soluciones",
+            "primary_tools": [
+                "context7",
+                "fetch"
+            ],
+            "secondary_tools": [
+                "smart-coding-mcp"
+            ],
+            "cli_suggestion": null
+        }
+    },
+    "skills_locations": {
+        "project_skills": ".agent/skills/",
+        "global_skills": "${GEMINI_HOME}/Skills proyectos/",
+        "_note": "global_skills usa variable de entorno GEMINI_HOME. Default: ~/.gemini/"
+    },
+    "auto_suggestions": {
+        "before_commit": "💡 Tip: Ejecuta CLI → Opción [5] para escanear seguridad",
+        "after_many_files": "💡 Tip: Ejecuta CLI → Opción [1] para actualizar índice RAG",
+        "creating_feature": "💡 Tip: Usa CLI → Opción [7] para crear desde template",
+        "debugging": "💡 Tip: Considera usar sequential-thinking para descomponer el problema"
+    }
+}

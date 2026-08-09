@@ -1,0 +1,29 @@
+{
+    "system_version": "2026.1.0",
+    "project_paths": {
+        "architect": "C:\\Users\\ASUS\\.gemini\\Creador-proyectos-compilador\\gem-architect",
+        "builder": "C:\\Users\\ASUS\\.gemini\\Creador-proyectos-compilador\\gem-builder",
+        "engine": "C:\\Users\\ASUS\\.gemini\\Agente Copilot Engine"
+    },
+    "resource_paths": {
+        "skills_root": "C:\\Users\\ASUS\\.gemini\\Skills proyectos",
+        "mcp_config": "C:\\Users\\ASUS\\.gemini\\antigravity\\mcp_config.json",
+        "artifacts_root": "C:\\Users\\ASUS\\.gemini\\Gem-Trinity-Genesis\\artifacts"
+    },
+    "modules": {
+        "smart_context_packer": {
+            "enabled": true,
+            "max_tokens": 128000,
+            "compression_level": "semantic_high"
+        },
+        "mcp_neural_grid": {
+            "enabled": true,
+            "auto_heal": true,
+            "check_interval_sec": 30
+        },
+        "skill_genetics": {
+            "enabled": true,
+            "adaptation_mode": "context_aware"
+        }
+    }
+}

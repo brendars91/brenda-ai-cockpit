@@ -1,0 +1,16 @@
+{
+  "id": "TASK-2539A418",
+  "description": "Test task",
+  "metadata": {
+    "test": true
+  },
+  "priority": 5,
+  "status": "completed",
+  "created_at": "2026-01-18T09:25:33.611785",
+  "updated_at": "2026-01-18T09:25:33.919418",
+  "started_at": "2026-01-18T09:25:33.855022",
+  "completed_at": "2026-01-18T09:25:33.919418",
+  "result": {
+    "result": "ok"
+  }
+}

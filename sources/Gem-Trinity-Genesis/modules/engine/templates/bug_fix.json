@@ -1,0 +1,73 @@
+{
+    "template_id": "TPL-BUG-FIX",
+    "name": "Corregir Bug",
+    "description": "Template para debugging y corrección de bugs",
+    "category": "maintenance",
+    "variables": {
+        "bug_description": "Descripción del bug",
+        "affected_file": "Archivo afectado",
+        "error_message": "Mensaje de error (si aplica)"
+    },
+    "plan_template": {
+        "schema_version": "1.0.0",
+        "plan_id": "PLAN-{{timestamp}}",
+        "objective": {
+            "description": "Corregir: {{bug_description}}",
+            "scope": "bugfix",
+            "requires_hitl": true
+        },
+        "steps": [
+            {
+                "id": "S01",
+                "action": "analyze",
+                "target": "{{affected_file}}",
+                "description": "Analizar contexto del error y código relacionado",
+                "tool": "smart-coding-mcp",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S02",
+                "action": "read",
+                "target": "{{affected_file}}",
+                "description": "Leer código fuente del archivo afectado",
+                "tool": "mcp_filesystem_read_file",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S03",
+                "action": "analyze",
+                "target": "logs/",
+                "description": "Revisar logs relevantes",
+                "tool": "grep_search",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S04",
+                "action": "write",
+                "target": "{{affected_file}}",
+                "description": "Aplicar corrección",
+                "tool": "mcp_filesystem_edit_file",
+                "requires_human_approval": true,
+                "validation": {
+                    "lint_check": true,
+                    "type_check": true
+                }
+            },
+            {
+                "id": "S05",
+                "action": "verify",
+                "target": ".",
+                "description": "Verificar que el bug está corregido",
+                "tool": "run_command",
+                "requires_human_approval": false
+            }
+        ],
+        "evidence": {
+            "required": [
+                "error_context",
+                "fix_diff",
+                "verification_output"
+            ]
+        }
+    }
+}

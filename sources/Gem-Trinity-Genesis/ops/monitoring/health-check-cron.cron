@@ -1,0 +1,11 @@
+# Gem Trinity Genesis Health Check Monitoring
+# Add to crontab with: crontab -l | { cat; cat ops/monitoring/health-check-cron.cron; } | crontab -
+
+# Check health every 5 minutes
+*/5 * * * * cd /path/to/Gem-Trinity-Genesis && bash ops/monitoring/health-check.sh >> logs/health-check.log 2>&1
+
+# Weekly maintenance: clean old logs (Sundays at 3 AM)
+0 3 * * 0 cd /path/to/Gem-Trinity-Genesis && find logs/ -name "*.log" -mtime +30 -delete
+
+# Monthly dependency update check (1st of month at 2 AM)
+0 2 1 * * cd /path/to/Gem-Trinity-Genesis && make update-deps 2>&1 | mail -s "Monthly dependency update" your-email@example.com

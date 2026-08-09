@@ -1,0 +1,91 @@
+{
+  "name": "Gem Trinity Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Every 5 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/health/detailed",
+        "options": {}
+      },
+      "id": "http-request",
+      "name": "Check Backend Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "healthy-check",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "healthy",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-status",
+      "name": "Check if Healthy",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {},
+      "id": "no-action",
+      "name": "System Healthy (No Action)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "channel": "#alerts",
+        "text": "=⚠️ **Gem Trinity Genesis Alert**\n\nStatus: **{{ $json.status }}**\n\nIssues: {{ $json.issues.join(', ') }}\n\nCPU: {{ $json.system_metrics.cpu_percent }}%\nMemory: {{ $json.system_metrics.memory_percent }}%\nDisk: {{ $json.system_metrics.disk_percent }}%",
+        "otherOptions": {}
+      },
+      "id": "slack-alert",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [850, 400]
+    }
+  ],
+  "connections": {
+    "Every 5 minutes": {
+      "main": [[{ "node": "Check Backend Health", "type": "main", "index": 0 }]]
+    },
+    "Check Backend Health": {
+      "main": [[{ "node": "Check if Healthy", "type": "main", "index": 0 }]]
+    },
+    "Check if Healthy": {
+      "main": [
+        [{ "node": "System Healthy (No Action)", "type": "main", "index": 0 }],
+        [{ "node": "Send Slack Alert", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-17T00:00:00.000Z",
+  "versionId": "1"
+}

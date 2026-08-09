@@ -1,0 +1,192 @@
+{
+    "name": "AGCCE Evidence Report Sender",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "agcce-evidence-ready",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.event_type }}",
+                            "operation": "equals",
+                            "value2": "EVIDENCE_READY"
+                        }
+                    ]
+                }
+            },
+            "id": "validate-event",
+            "name": "Validate Event Type",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "// Extraer datos del evidence\nconst payload = $input.first().json.payload;\n\n// Formatear mensaje\nconst planId = payload.plan_id || 'Unknown';\nconst objective = payload.summary?.objective || 'No objective';\nconst stepsCompleted = payload.summary?.steps_completed || 0;\nconst stepsTotal = payload.summary?.steps_total || 0;\nconst verificationPassed = payload.summary?.verification_passed || false;\n\n// Crear resumen formateado\nconst summary = {\n  text: `📋 *AGCCE Evidence Report*\\n\\n` +\n        `*Plan ID:* ${planId}\\n` +\n        `*Objective:* ${objective}\\n` +\n        `*Progress:* ${stepsCompleted}/${stepsTotal} steps\\n` +\n        `*Verification:* ${verificationPassed ? '✅ Passed' : '❌ Failed'}\\n` +\n        `*Evidence Path:* ${payload.evidence_path || 'N/A'}`,\n  planId: planId,\n  success: verificationPassed,\n  timestamp: new Date().toISOString()\n};\n\nreturn [{ json: summary }];"
+            },
+            "id": "format-message",
+            "name": "Format Report Message",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                650,
+                250
+            ]
+        },
+        {
+            "parameters": {
+                "channel": "#agcce-reports",
+                "text": "={{ $json.text }}",
+                "otherOptions": {
+                    "mrkdwn": true
+                }
+            },
+            "id": "slack-notify",
+            "name": "Send to Slack",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 1,
+            "position": [
+                850,
+                200
+            ],
+            "disabled": true,
+            "notesInFlow": true,
+            "notes": "Habilitar y configurar credenciales de Slack"
+        },
+        {
+            "parameters": {
+                "fromEmail": "agcce@example.com",
+                "toEmail": "={{ $env.REPORT_EMAIL }}",
+                "subject": "AGCCE Evidence Report - {{ $json.planId }}",
+                "text": "={{ $json.text }}",
+                "options": {}
+            },
+            "id": "email-notify",
+            "name": "Send Email",
+            "type": "n8n-nodes-base.emailSend",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ],
+            "disabled": true,
+            "notesInFlow": true,
+            "notes": "Habilitar y configurar SMTP"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: true, message: 'Evidence report processed', plan_id: $json.planId }) }}"
+            },
+            "id": "respond-success",
+            "name": "Respond Success",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1050,
+                250
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify({ success: false, error: 'Invalid event type' }) }}",
+                "options": {
+                    "responseCode": 400
+                }
+            },
+            "id": "respond-error",
+            "name": "Respond Error",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                650,
+                400
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "Validate Event Type",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Validate Event Type": {
+            "main": [
+                [
+                    {
+                        "node": "Format Report Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Respond Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format Report Message": {
+            "main": [
+                [
+                    {
+                        "node": "Send to Slack",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Send Email",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Respond Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [
+        {
+            "name": "AGCCE",
+            "createdAt": "2026-01-17T12:00:00.000Z",
+            "updatedAt": "2026-01-17T12:00:00.000Z"
+        }
+    ],
+    "triggerCount": 0,
+    "updatedAt": "2026-01-17T12:00:00.000Z",
+    "versionId": "1"
+}

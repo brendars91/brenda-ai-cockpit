@@ -1,0 +1,73 @@
+{
+    "template_id": "TPL-NEW-FEATURE",
+    "name": "Nueva Funcionalidad",
+    "description": "Template para implementar una nueva funcionalidad en el proyecto",
+    "category": "development",
+    "variables": {
+        "feature_name": "Nombre de la funcionalidad",
+        "target_module": "Módulo donde implementar",
+        "description": "Descripción detallada"
+    },
+    "plan_template": {
+        "schema_version": "1.0.0",
+        "plan_id": "PLAN-{{timestamp}}",
+        "objective": {
+            "description": "Implementar {{feature_name}}",
+            "scope": "feature",
+            "requires_hitl": true
+        },
+        "steps": [
+            {
+                "id": "S01",
+                "action": "analyze",
+                "target": "{{target_module}}",
+                "description": "Analizar módulo objetivo y dependencias",
+                "tool": "smart-coding-mcp",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S02",
+                "action": "read",
+                "target": "{{target_module}}",
+                "description": "Leer implementación actual",
+                "tool": "mcp_filesystem_read_file",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S03",
+                "action": "write",
+                "target": "{{target_module}}",
+                "description": "Implementar {{feature_name}}",
+                "tool": "mcp_filesystem_edit_file",
+                "requires_human_approval": true,
+                "validation": {
+                    "lint_check": true,
+                    "type_check": true
+                }
+            },
+            {
+                "id": "S04",
+                "action": "analyze",
+                "target": "tests/",
+                "description": "Crear tests para la nueva funcionalidad",
+                "tool": "mcp_filesystem_write_file",
+                "requires_human_approval": true
+            },
+            {
+                "id": "S05",
+                "action": "verify",
+                "target": ".",
+                "description": "Ejecutar tests",
+                "tool": "run_command",
+                "requires_human_approval": false
+            }
+        ],
+        "evidence": {
+            "required": [
+                "lint_output",
+                "test_results",
+                "diff_summary"
+            ]
+        }
+    }
+}

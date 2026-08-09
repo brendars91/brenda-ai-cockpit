@@ -1,0 +1,17 @@
+{
+  "name": "ab_test_summarizers",
+  "gem_a": "document_summarizer_v1.0.0",
+  "gem_b": "document_summarizer_v2_v1.0.0",
+  "test_prompts": [
+    "Analiza este documento y genera un resumen",
+    "Lista los puntos clave del texto",
+    "Identifica las acciones pendientes"
+  ],
+  "iterations": 3,
+  "metrics": [
+    "latency",
+    "tokens",
+    "quality"
+  ],
+  "created_at": "2026-01-19T17:47:34.276466+00:00"
+}

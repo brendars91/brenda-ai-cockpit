@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.tauri/
+target/
+*.sqlite
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.tsbuildinfo
+coverage/
+.husky/_
+backend/.coverage
+backend/data/

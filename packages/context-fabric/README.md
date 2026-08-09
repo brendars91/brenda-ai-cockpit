@@ -1,0 +1,3 @@
+# context-fabric
+
+Paquete objetivo reutilizable para Brenda AI Cockpit.

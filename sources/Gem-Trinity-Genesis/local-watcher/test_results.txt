@@ -1,0 +1,12 @@
+=== TEST 1: MOCK SAP RESULT ===
+'\n✅ SAP Monthly Close Automation - Execution Summary\n\n📊 AR/AP Validation:\n   - Total AR: €1,425,320.00 (Validated ✓)\n   - Total AP: €987,450.00 (Validated ✓)\n   - Discrepancies: 0\n\n💱 FX Adjustments:\n   - EUR/USD: Variance €12,450 (Adjusted via FB50)\n   - EUR/GBP: Variance €8,320 (Adjusted via FB50)\n\n🏦 Bank Reconciliation:\n   - Account 1100 (Main): Reconciled ✓\n   - Account 1120 (Payroll): Reconciled ✓\n   - Outstanding items: 3 (Total: €2,150)\n\n📑 IFRS Reclassifications:\n   - IAS 21 (FX): Completed ✓\n   - IFRS 9 (Instruments): Completed ✓\n\n✅ All transactions posted to SAP S/4HANA production successfully.\n'
+
+=== TEST 2: MOCK MARKETING RESULT ===
+'\n📊 Marketing Campaign Analysis\n\nCampaign: Q1 Digital Outreach\nChannels: Email, Social, PPC\n\n📈 Key Metrics:\n   - Total Reach: 245,000\n   - Engagement Rate: 4.2%\n   - CTR: 2.8%\n   - Conversion Rate: 1.2'
+
+=== TEST 3: MOCK TELEMETRY ===
+CPU: 57.72157524459841
+Memory: 701
+Tokens: 1685
+Latency: 311
+Random values confirmed: True

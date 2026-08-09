@@ -1,0 +1,182 @@
+{
+    "mcpServers": {
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp"
+            ],
+            "description": "Documentation and library context retrieval",
+            "category": "knowledge"
+        },
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "${USER_HOME}"
+            ],
+            "description": "File system access and manipulation",
+            "category": "core"
+        },
+        "snyk": {
+            "command": "${USER_HOME}\\AppData\\Local\\snyk\\vscode-cli\\snyk-win.exe",
+            "args": [
+                "mcp",
+                "-t",
+                "stdio"
+            ],
+            "env": {
+                "SNYK_API": "https://api.snyk.io",
+                "IDE_CONFIG_PATH": "Antigravity",
+                "TRUSTED_FOLDERS": "${USER_HOME}"
+            },
+            "description": "Security vulnerability scanning",
+            "category": "security"
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ],
+            "description": "Complex problem decomposition",
+            "category": "reasoning"
+        },
+        "smart-coding-mcp": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "github:omar-haris/smart-coding-mcp",
+                "--workspace",
+                "${USER_HOME}"
+            ],
+            "description": "Semantic code search and indexing",
+            "category": "development"
+        },
+        "playwright": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@playwright/mcp@latest"
+            ],
+            "description": "Browser automation and testing",
+            "category": "testing"
+        },
+        "n8n-native": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "supergateway",
+                "--streamableHttp",
+                "http://localhost:5678/mcp-server/http",
+                "--header",
+                "authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0Y2Q4ODQ5Mi04YzUxLTQzYWEtYjdhZC05NWVmZDUzMjg1NzYiLCJpc3MiOiJuOG4iLCJhdWQiOiJtY3Btc2VydmVyLWFwaSIsImp0aSI6ImJmYmZlNGRiLTk3MDctNDNiNy04YjQ5LTMxOGNjNWFiMTVmNSIsImlhdCI6MTc2NzAzOTM1Nn0.JTcFKyY4pSaNhd2XLr8eddPt0O9zadh8xsbT7I-fH0U"
+            ],
+            "description": "n8n workflow automation (native)",
+            "category": "automation"
+        },
+        "n8n-mcp": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "--init",
+                "-e",
+                "MCP_MODE=stdio",
+                "-e",
+                "LOG_LEVEL=error",
+                "-e",
+                "DISABLE_CONSOLE_OUTPUT=true",
+                "-e",
+                "N8N_API_URL=http://host.docker.internal:5678",
+                "-e",
+                "N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0Y2Q4ODQ5Mi04YzUxLTQzYWEtYjdhZC05NWVmZDUzMjg1NzYiLCJpc3MiOiJuOG4iLCJhdWQiOiJtY3Atc2VydmVyLWFwaSIsImp0aSI6ImJmYmZlNGRiLTk3MDctNDNiNy04YjQ5LTMxOGNjNWFiMTVmNSIsImlhdCI6MTc2NzAzOTM1Nn0.JTcFKyY4pSaNhd2XLr8eddPt0O9zadh8xsbT7I-fH0U",
+                "-e",
+                "WEBHOOK_SECURITY_MODE=moderate",
+                "ghcr.io/czlonkowski/n8n-mcp:latest"
+            ],
+            "description": "n8n workflow automation (Docker)",
+            "category": "automation"
+        },
+        "github": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "GITHUB_PERSONAL_ACCESS_TOKEN",
+                "ghcr.io/github/github-mcp-server"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "<REDACTED_GITHUB_TOKEN>"
+            },
+            "description": "GitHub repository management",
+            "category": "development"
+        },
+        "fetch": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "mcp/fetch"
+            ],
+            "description": "HTTP fetch and web scraping",
+            "category": "network"
+        },
+        "semgrep": {
+            "command": "semgrep",
+            "args": [
+                "mcp"
+            ],
+            "description": "Static code analysis",
+            "category": "security"
+        },
+        "mcp-sbom": {
+            "command": "python",
+            "args": [
+                "${USER_HOME}\\.gemini\\mcp-sbom-server\\src\\mcp_sbom\\server.py"
+            ],
+            "env": {
+                "PYTHONPATH": "${USER_HOME}\\.gemini\\mcp-sbom-server\\src"
+            },
+            "description": "Software Bill of Materials generation",
+            "category": "security"
+        },
+        "opa": {
+            "command": "python",
+            "args": [
+                "${USER_HOME}\\.gemini\\open-policy-agent-opa-rest-api\\mcp_server\\main.py",
+                "stdio"
+            ],
+            "description": "Open Policy Agent for policy enforcement",
+            "category": "security"
+        },
+        "docker": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-v",
+                "//./pipe/docker_engine://./pipe/docker_engine",
+                "mcp/docker"
+            ],
+            "description": "Docker container management",
+            "category": "devops"
+        }
+    },
+    "categories": {
+        "core": "Essential system tools",
+        "knowledge": "Documentation and context retrieval",
+        "security": "Vulnerability scanning and policy",
+        "development": "Code analysis and repository management",
+        "testing": "Browser and integration testing",
+        "automation": "Workflow automation tools",
+        "network": "HTTP and web tools",
+        "devops": "Container and infrastructure management"
+    }
+}

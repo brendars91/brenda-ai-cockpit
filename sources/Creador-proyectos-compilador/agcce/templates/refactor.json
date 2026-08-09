@@ -1,0 +1,73 @@
+{
+    "template_id": "TPL-REFACTOR",
+    "name": "Refactorización",
+    "description": "Template para refactorizar código existente",
+    "category": "maintenance",
+    "variables": {
+        "refactor_scope": "Alcance de la refactorización",
+        "target_files": "Archivos a refactorizar (separados por coma)",
+        "reason": "Razón de la refactorización"
+    },
+    "plan_template": {
+        "schema_version": "1.0.0",
+        "plan_id": "PLAN-{{timestamp}}",
+        "objective": {
+            "description": "Refactorizar: {{refactor_scope}}",
+            "scope": "refactor",
+            "requires_hitl": true
+        },
+        "steps": [
+            {
+                "id": "S01",
+                "action": "analyze",
+                "target": "{{target_files}}",
+                "description": "Analizar código actual y dependencias",
+                "tool": "smart-coding-mcp",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S02",
+                "action": "read",
+                "target": "{{target_files}}",
+                "description": "Leer implementación actual",
+                "tool": "mcp_filesystem_read_file",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S03",
+                "action": "analyze",
+                "target": ".",
+                "description": "Identificar dependencias y usos del código a refactorizar",
+                "tool": "grep_search",
+                "requires_human_approval": false
+            },
+            {
+                "id": "S04",
+                "action": "write",
+                "target": "{{target_files}}",
+                "description": "Aplicar refactorización",
+                "tool": "mcp_filesystem_edit_file",
+                "requires_human_approval": true,
+                "validation": {
+                    "lint_check": true,
+                    "type_check": true
+                }
+            },
+            {
+                "id": "S05",
+                "action": "verify",
+                "target": ".",
+                "description": "Ejecutar tests para verificar que no hay regresiones",
+                "tool": "run_command",
+                "requires_human_approval": false
+            }
+        ],
+        "evidence": {
+            "required": [
+                "before_after_diff",
+                "test_results",
+                "dependency_analysis"
+            ]
+        }
+    }
+}

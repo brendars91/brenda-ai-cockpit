@@ -1,0 +1,22 @@
+[
+  {
+    "source_repo": "interfaz-herramientas-IA",
+    "files_imported": 159,
+    "path": "sources/interfaz-herramientas-IA"
+  },
+  {
+    "source_repo": "Gem-Trinity-Genesis",
+    "files_imported": 1321,
+    "path": "sources/Gem-Trinity-Genesis"
+  },
+  {
+    "source_repo": "Creador-proyectos-compilador",
+    "files_imported": 255,
+    "path": "sources/Creador-proyectos-compilador"
+  },
+  {
+    "source_repo": "Generador-proyectos-determinista",
+    "files_imported": 151,
+    "path": "sources/Generador-proyectos-determinista"
+  }
+]

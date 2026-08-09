@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Mis Proyectos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Tema Claro */
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8ed;
+            --border-color: #d1d1d6;
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent-green: #34c759;
+            --accent-red: #ff3b30;
+            --accent-yellow: #ff9500;
+            --accent-blue: #007aff;
+            --accent-purple: #af52de;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --accent-blue: #58a6ff;
+            --accent-purple: #a371f7;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: white;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .project-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-selector label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .project-selector select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            min-width: 200px;
+            cursor: pointer;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+
+        .btn-icon.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Notificaciones */
+        .notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 10px 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .quick-action:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+        }
+
+        .quick-action.primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            border: none;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-card h3 {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .metric-value.success {
+            color: var(--accent-green);
+        }
+
+        .metric-value.warning {
+            color: var(--accent-yellow);
+        }
+
+        .metric-value.danger {
+            color: var(--accent-red);
+        }
+
+        .metric-value.info {
+            color: var(--accent-blue);
+        }
+
+        .metric-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .metric-compare {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .metric-compare.up {
+            color: var(--accent-green);
+        }
+
+        .metric-compare.down {
+            color: var(--accent-red);
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            height: 320px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Timeline */
+        .timeline {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .timeline-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 16px;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .timeline-icon.critical {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-red);
+        }
+
+        .timeline-icon.high {
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--accent-yellow);
+        }
+
+        .timeline-icon.blocked {
+            background: rgba(63, 185, 80, 0.15);
+            color: var(--accent-green);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .timeline-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 18px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: var(--border-color);
+        }
+
+        .btn-export {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Export Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+    <div id="notifications" class="notifications"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">A</div>
+                <h1>Bitácora de Mis Proyectos</h1>
+            </div>
+
+            <div class="header-controls">
+                <div class="project-selector">
+                    <label>Proyecto:</label>
+                    <select id="project-select" onchange="filterByProject()">
+                        <option value="all">Todos los proyectos</option>
+                    </select>
+                    <div class="project-actions">
+                        <button class="btn-icon" id="delete-project-btn" onclick="deleteCurrentProject()"
+                            title="Eliminar proyecto del dashboard">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="theme-icon">☀️</span>
+                    <span id="theme-text">Modo Claro</span>
+                </button>
+
+                <div class="status-badge">
+                    <div class="status-dot"></div>
+                    <span id="status-text">Conectado</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-action primary" onclick="runIndexer()">
+                🔄 Indexar
+            </button>
+            <button class="quick-action" onclick="viewLogs()">
+                📋 Ver Logs
+            </button>
+            <button class="quick-action" onclick="clearCache()">
+                🗑️ Limpiar Cache
+            </button>
+            <button class="quick-action" onclick="refreshData()">
+                ↻ Actualizar
+            </button>
+            <button class="quick-action btn-export" onclick="openExportModal()">
+                📥 Exportar Reporte
+            </button>
+        </div>
+
+        <!-- Reliability Metrics -->
+        <section class="section">
+            <div class="section-header">
+                <h2>🔒 Fiabilidad</h2>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Tasa de Éxito de Planes</h3>
+                    <div class="metric-value success" id="success-rate">---%</div>
+                    <div class="metric-detail" id="plans-detail">-- planes generados</div>
+                    <div class="metric-compare up" id="success-compare">
+                        <span>↑</span> vs semana anterior
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <h3>Auto-Correcciones</h3>
+                    <div class="metric-value info" id="corrections">---</div>
+                    <div class="metric-detail">Correcciones automáticas</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Alucinaciones Bloqueadas</h3>
+                    <div class="metric-value warning" id="hallucinations">---</div>
+                    <div class="metric-detail">Paths inexistentes evitados</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Metrics -->
+        <section class="section">
+            <div class="section-header">
+                <h2>⚡ Rendimiento</h2>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Generación de Planes</h3>
+                    <div class="metric-value info" id="plan-latency">--- ms</div>
+                    <div class="metric-detail">Latencia promedio</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Indexación RAG</h3>
+                    <div class="metric-value info" id="rag-latency">--- ms</div>
+                    <div class="metric-detail">Latencia promedio</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Eficiencia Delta</h3>
+                    <div class="metric-value success" id="delta-efficiency">---%</div>
+                    <div class="metric-detail">Archivos evitados por incremental</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid-2">
+            <!-- Security Metrics -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>🛡️ Seguridad</h2>
+                </div>
+                <div class="metrics-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="metric-card">
+                        <h3>Escaneos Snyk</h3>
+                        <div class="metric-value info" id="snyk-scans">---</div>
+                        <div class="metric-detail">Total ejecutados</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Commits Bloqueados</h3>
+                        <div class="metric-value danger" id="commits-blocked">---</div>
+                        <div class="metric-detail">Por vulnerabilidades</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chart -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>📊 Actividad (7 días)</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Comparativa Temporal -->
+        <section class="section">
+            <div class="section-header">
+                <h2>📈 Comparativa Temporal</h2>
+            </div>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="compareChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Security Timeline -->
+        <section class="section">
+            <div class="section-header">
+                <h2>🔐 Timeline de Seguridad</h2>
+            </div>
+            <div class="timeline" id="security-timeline">
+                <div class="timeline-header">
+                    <span>Eventos de seguridad recientes</span>
+                    <button class="btn" onclick="exportTimeline()">Exportar</button>
+                </div>
+                <div class="empty-state" id="timeline-empty">
+                    Sin eventos de seguridad registrados
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="modal">
+            <h3>📥 Exportar Reporte</h3>
+            <p>Selecciona el formato de exportación:</p>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeExportModal()">Cancelar</button>
+                <button class="btn btn-export" onclick="exportJSON()">Exportar JSON</button>
+                <button class="btn btn-export" onclick="exportPDF()">Exportar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        let metricsData = {
+            reliability: { success_rate_pct: 0, plans_generated: 0, total_self_corrections: 0, hallucinations_blocked: 0 },
+            performance: { avg_plan_generation_ms: 0, avg_rag_indexing_ms: 0, avg_delta_efficiency_pct: 0 },
+            security: { snyk_scans: 0, commits_blocked: 0 },
+            timeline: [],
+            projects: []
+        };
+
+        let currentProject = 'all';
+        let activityChart, compareChart;
+
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+            document.getElementById('theme-text').textContent = isDark ? 'Modo Oscuro' : 'Modo Claro';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        // Cargar tema guardado
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'light') {
+            document.getElementById('theme-icon').textContent = '🌙';
+            document.getElementById('theme-text').textContent = 'Modo Oscuro';
+        }
+
+        // Notifications
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notifications');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `<span>${type === 'success' ? '✓' : type === 'warning' ? '!' : '✕'}</span> ${message}`;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // Quick Actions
+        function runIndexer() {
+            showNotification('Indexación iniciada...', 'success');
+        }
+
+        function viewLogs() {
+            window.open('../logs/telemetry.jsonl', '_blank');
+        }
+
+        function clearCache() {
+            if (confirm('¿Limpiar cache de métricas?')) {
+                showNotification('Cache limpiado', 'success');
+            }
+        }
+
+        // Export Modal
+        function openExportModal() {
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.remove('active');
+        }
+
+        function exportJSON() {
+            const dataStr = JSON.stringify(metricsData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reporte_${currentProject}_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            closeExportModal();
+            showNotification('Reporte JSON exportado', 'success');
+        }
+
+        function exportPDF() {
+            // Crear HTML para imprimir como PDF
+            const printContent = `
+                <html><head><title>Reporte AGCCE</title>
+                <style>body{font-family:Arial;padding:20px}h1{color:#007aff}.metric{margin:10px 0;padding:10px;border:1px solid #ccc}</style>
+                </head><body>
+                <h1>Bitácora de Mis Proyectos - Reporte</h1>
+                <p>Fecha: ${new Date().toLocaleString()}</p>
+                <p>Proyecto: ${currentProject}</p>
+                <h2>Métricas</h2>
+                <div class="metric"><strong>Tasa de Éxito:</strong> ${metricsData.reliability.success_rate_pct}%</div>
+                <div class="metric"><strong>Planes Generados:</strong> ${metricsData.reliability.plans_generated}</div>
+                <div class="metric"><strong>Correcciones:</strong> ${metricsData.reliability.total_self_corrections}</div>
+                <div class="metric"><strong>Scans Snyk:</strong> ${metricsData.security.snyk_scans}</div>
+                <div class="metric"><strong>Commits Bloqueados:</strong> ${metricsData.security.commits_blocked}</div>
+                </body></html>
+            `;
+            const win = window.open('', '', 'width=800,height=600');
+            win.document.write(printContent);
+            win.document.close();
+            win.print();
+            closeExportModal();
+            showNotification('Preparado para imprimir PDF', 'success');
+        }
+
+        function exportTimeline() {
+            const dataStr = JSON.stringify(metricsData.timeline, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `timeline_seguridad_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showNotification('Timeline exportado', 'success');
+        }
+
+        // Project Filter
+        function filterByProject() {
+            currentProject = document.getElementById('project-select').value;
+            loadTelemetryData();
+            updateDeleteButton();
+            showNotification(`Filtrado: ${currentProject === 'all' ? 'Todos' : currentProject}`, 'success');
+        }
+
+        function updateDeleteButton() {
+            const deleteBtn = document.getElementById('delete-project-btn');
+            const protectedProjects = ['all', 'Agente Copilot Engine'];
+            if (protectedProjects.includes(currentProject)) {
+                deleteBtn.classList.add('disabled');
+                deleteBtn.disabled = true;
+            } else {
+                deleteBtn.classList.remove('disabled');
+                deleteBtn.disabled = false;
+            }
+        }
+
+        async function deleteCurrentProject() {
+            const protectedProjects = ['all', 'Agente Copilot Engine'];
+            if (protectedProjects.includes(currentProject)) {
+                showNotification('No puedes eliminar este proyecto', 'error');
+                return;
+            }
+
+            if (!confirm(`¿Estás seguro de que quieres eliminar "${currentProject}" del dashboard?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('../scripts/unregister_project.py', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project: currentProject })
+                });
+
+                if (response.ok) {
+                    showNotification(`Proyecto "${currentProject}" eliminado`, 'success');
+                    currentProject = 'all';
+                    document.getElementById('project-select').value = 'all';
+                    loadTelemetryData();
+                } else {
+                    // Fallback: usar comando Python directamente
+                    showNotification('Ejecuta: python scripts/unregister_project.py "' + currentProject + '"', 'warning');
+                }
+            } catch (e) {
+                showNotification('Ejecuta en terminal: python scripts/unregister_project.py "' + currentProject + '"', 'warning');
+            }
+        }
+
+        // Charts
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary') } } },
+                scales: {
+                    x: { grid: { color: getComputedStyle(document.body).getPropertyValue('--border-color') }, ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary') } },
+                    y: { grid: { color: getComputedStyle(document.body).getPropertyValue('--border-color') }, ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary') } }
+                }
+            };
+
+            const ctx1 = document.getElementById('activityChart').getContext('2d');
+            activityChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                    datasets: [
+                        { label: 'Planes generados', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#58a6ff', backgroundColor: 'rgba(88,166,255,0.1)', fill: true, tension: 0.4 },
+                        { label: 'Bloqueos Snyk', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#f85149', backgroundColor: 'rgba(248,81,73,0.1)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: chartOptions
+            });
+
+            const ctx2 = document.getElementById('compareChart').getContext('2d');
+            compareChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Éxito %', 'Correcciones', 'Scans', 'Bloqueos'],
+                    datasets: [
+                        { label: 'Esta semana', data: [0, 0, 0, 0], backgroundColor: '#58a6ff' },
+                        { label: 'Semana anterior', data: [0, 0, 0, 0], backgroundColor: '#8b949e' }
+                    ]
+                },
+                options: chartOptions
+            });
+        }
+
+        function updateUI(data) {
+            document.getElementById('success-rate').textContent = data.reliability.success_rate_pct + '%';
+            document.getElementById('plans-detail').textContent = data.reliability.plans_generated + ' planes generados';
+            document.getElementById('corrections').textContent = data.reliability.total_self_corrections;
+            document.getElementById('hallucinations').textContent = data.reliability.hallucinations_blocked;
+            document.getElementById('plan-latency').textContent = data.performance.avg_plan_generation_ms + ' ms';
+            document.getElementById('rag-latency').textContent = data.performance.avg_rag_indexing_ms + ' ms';
+            document.getElementById('delta-efficiency').textContent = data.performance.avg_delta_efficiency_pct + '%';
+            document.getElementById('snyk-scans').textContent = data.security.snyk_scans;
+            document.getElementById('commits-blocked').textContent = data.security.commits_blocked;
+            updateTimeline(data.timeline);
+            updateProjects(data.projects);
+        }
+
+        function updateProjects(projects) {
+            const select = document.getElementById('project-select');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="all">Todos los proyectos</option>';
+            (projects || []).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                select.appendChild(opt);
+            });
+            select.value = currentValue;
+            updateDeleteButton();
+        }
+
+        function updateTimeline(events) {
+            const container = document.getElementById('security-timeline');
+            const emptyState = document.getElementById('timeline-empty');
+            if (!events || events.length === 0) { emptyState.style.display = 'block'; return; }
+            emptyState.style.display = 'none';
+            const header = container.querySelector('.timeline-header');
+            container.innerHTML = '';
+            container.appendChild(header);
+
+            events.slice(0, 10).forEach(event => {
+                const metrics = event.metrics || {};
+                const severity = metrics.severity || 'info';
+                const eventType = metrics.event_type || 'unknown';
+                const timestamp = event.timestamp ? new Date(event.timestamp).toLocaleString() : '';
+
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                let iconClass = 'blocked', icon = '✓';
+                if (severity === 'critical') { iconClass = 'critical'; icon = '✕'; }
+                else if (severity === 'high') { iconClass = 'high'; icon = '!'; }
+
+                item.innerHTML = `
+                    <div class="timeline-icon ${iconClass}">${icon}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${eventType.replace(/_/g, ' ').toUpperCase()}</div>
+                        <div class="timeline-meta">${metrics.file_path || 'Sistema'}</div>
+                    </div>
+                    <div class="timeline-time">${timestamp}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function loadTelemetryData() {
+            try {
+                const response = await fetch('../logs/dashboard_data.json');
+                if (response.ok) {
+                    metricsData = await response.json();
+                    updateUI(metricsData);
+                }
+            } catch (e) { console.log('Usando datos de ejemplo'); }
+        }
+
+        function refreshData() {
+            document.getElementById('status-text').textContent = 'Actualizando...';
+            loadTelemetryData().then(() => {
+                document.getElementById('status-text').textContent = 'Conectado';
+                showNotification('Datos actualizados', 'success');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            loadTelemetryData();
+            setInterval(refreshData, 30000);
+        });
+    </script>
+</body>
+
+</html>

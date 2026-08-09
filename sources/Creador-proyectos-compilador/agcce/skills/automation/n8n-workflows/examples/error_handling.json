@@ -1,0 +1,333 @@
+{
+    "name": "[Example] Error Handling Pattern",
+    "nodes": [
+        {
+            "parameters": {},
+            "id": "manual-1",
+            "name": "Manual Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://api.example.com/v1/resource",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "httpHeaderAuth",
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "json"
+                        }
+                    },
+                    "timeout": 10000
+                }
+            },
+            "id": "http-1",
+            "name": "API Call",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                470,
+                300
+            ],
+            "onError": "continueErrorOutput"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "leftValue": "",
+                        "caseSensitive": true,
+                        "typeValidation": "loose"
+                    },
+                    "combinator": "and",
+                    "conditions": [
+                        {
+                            "leftValue": "={{ $json.error }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "isEmpty"
+                            }
+                        }
+                    ]
+                }
+            },
+            "id": "if-1",
+            "name": "Success?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                690,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Procesar respuesta exitosa\nconst data = $json;\n\nreturn [{\n  json: {\n    status: 'success',\n    data: data,\n    processedAt: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "code-success",
+            "name": "Process Success",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                910,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Analizar el error\nconst error = $json;\nconst errorMessage = error.message || error.error || JSON.stringify(error);\nconst statusCode = error.statusCode || error.code || 500;\n\n// Determinar si es retriable\nconst retriableStatuses = [408, 429, 500, 502, 503, 504];\nconst isRetriable = retriableStatuses.includes(statusCode);\n\n// Obtener contador de reintentos del static data\nconst staticData = $getWorkflowStaticData('global');\nconst retryKey = `retry_${$execution.id}`;\nconst retryCount = staticData[retryKey] || 0;\nconst maxRetries = 3;\n\nreturn [{\n  json: {\n    status: 'error',\n    error: {\n      message: errorMessage,\n      statusCode,\n      isRetriable,\n      retryCount,\n      maxRetries,\n      shouldRetry: isRetriable && retryCount < maxRetries\n    },\n    originalPayload: error,\n    timestamp: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "code-error",
+            "name": "Analyze Error",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                910,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "leftValue": "",
+                        "caseSensitive": true,
+                        "typeValidation": "strict"
+                    },
+                    "combinator": "and",
+                    "conditions": [
+                        {
+                            "leftValue": "={{ $json.error.shouldRetry }}",
+                            "rightValue": true,
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "equals"
+                            }
+                        }
+                    ]
+                }
+            },
+            "id": "if-retry",
+            "name": "Should Retry?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                1130,
+                400
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Incrementar contador de reintentos\nconst staticData = $getWorkflowStaticData('global');\nconst retryKey = `retry_${$execution.id}`;\nstaticData[retryKey] = ($json.error.retryCount || 0) + 1;\n\n// Calcular delay exponencial\nconst baseDelay = 1000; // 1 segundo\nconst delay = baseDelay * Math.pow(2, staticData[retryKey] - 1);\n\nconsole.log(`Retry attempt ${staticData[retryKey]}, waiting ${delay}ms`);\n\nreturn [{\n  json: {\n    retryAttempt: staticData[retryKey],\n    waitMs: delay,\n    message: `Retrying in ${delay}ms (attempt ${staticData[retryKey]})`,\n    originalError: $json.error\n  }\n}];"
+            },
+            "id": "code-retry",
+            "name": "Prepare Retry",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1350,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "amount": "={{ $json.waitMs }}",
+                "unit": "milliseconds"
+            },
+            "id": "wait-1",
+            "name": "Wait Before Retry",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                1570,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Error no retriable o max retries alcanzado\nconst error = $json.error;\n\nreturn [{\n  json: {\n    status: 'failed',\n    error: {\n      message: error.message,\n      statusCode: error.statusCode,\n      retryAttempts: error.retryCount\n    },\n    action: 'sent_to_dead_letter_queue',\n    timestamp: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "code-dlq",
+            "name": "Dead Letter Queue",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1350,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "channel": "#error-alerts",
+                "text": "=🚨 *Workflow Error Alert*\n\nWorkflow: `{{ $workflow.name }}`\nExecution: `{{ $execution.id }}`\n\n*Error:* {{ $json.error.message }}\n*Status Code:* {{ $json.error.statusCode }}\n*Retry Attempts:* {{ $json.error.retryAttempts || 0 }}\n\n_Sent to Dead Letter Queue_",
+                "otherOptions": {}
+            },
+            "id": "slack-1",
+            "name": "Alert Slack",
+            "type": "n8n-nodes-base.slack",
+            "typeVersion": 2.2,
+            "position": [
+                1570,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Éxito final\nconsole.log('Workflow completed successfully');\n\nreturn [{\n  json: {\n    finalStatus: 'completed',\n    data: $json.data || $json,\n    completedAt: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "code-final",
+            "name": "Final Output",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1130,
+                200
+            ]
+        }
+    ],
+    "connections": {
+        "Manual Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "API Call",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "API Call": {
+            "main": [
+                [
+                    {
+                        "node": "Success?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Analyze Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Success?": {
+            "main": [
+                [
+                    {
+                        "node": "Process Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Analyze Error",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process Success": {
+            "main": [
+                [
+                    {
+                        "node": "Final Output",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Analyze Error": {
+            "main": [
+                [
+                    {
+                        "node": "Should Retry?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Should Retry?": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Retry",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Dead Letter Queue",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Retry": {
+            "main": [
+                [
+                    {
+                        "node": "Wait Before Retry",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait Before Retry": {
+            "main": [
+                [
+                    {
+                        "node": "API Call",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Dead Letter Queue": {
+            "main": [
+                [
+                    {
+                        "node": "Alert Slack",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "saveExecutionProgress": true,
+        "saveManualExecutions": true,
+        "saveDataErrorExecution": "all",
+        "executionTimeout": 300
+    },
+    "tags": [
+        {
+            "name": "example"
+        },
+        {
+            "name": "error-handling"
+        },
+        {
+            "name": "retry"
+        }
+    ]
+}

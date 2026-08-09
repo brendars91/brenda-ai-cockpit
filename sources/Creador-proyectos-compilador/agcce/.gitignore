@@ -1,0 +1,181 @@
+# ============================================
+# AGCCE Ultra - .gitignore Profesional
+# ============================================
+
+# =====================
+# DATOS SENSIBLES
+# =====================
+# Logs con telemetría personal
+logs/*.jsonl
+logs/queue.jsonl
+logs/telemetry.jsonl
+logs/security_events.jsonl
+logs/audit_trail.jsonl
+logs/suggested_rules.json
+
+# Configuración con secretos
+config/n8n_webhooks.json
+.env
+.env.local
+.env.*.local
+*.env
+
+# Evidencia de ejecuciones
+evidence/
+evidence/*.json
+
+# =====================
+# PYTHON
+# =====================
+# Entornos virtuales
+.venv/
+venv/
+ENV/
+env/
+.Python
+python*/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Distribución
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+.eggs/
+*.whl
+
+# Instalación
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+
+# =====================
+# IDE / EDITORES
+# =====================
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (PyCharm, etc.)
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# =====================
+# SISTEMA OPERATIVO
+# =====================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+
+# =====================
+# NODE.JS (si aplica)
+# =====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# =====================
+# DOCKER
+# =====================
+docker-compose.override.yml
+.docker/
+
+# =====================
+# TEMPORALES
+# =====================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.log
+*.cache
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# =====================
+# ARCHIVOS GRANDES
+# =====================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Modelos de ML grandes
+*.h5
+*.pkl
+*.model
+*.pt
+*.pth
+
+# =====================
+# ESPECÍFICOS DEL PROYECTO
+# =====================
+# Archivos generados temporalmente
+plans/*.json.bak
+dashboard_data_backup.json
+
+# Exportaciones de auditoría
+audit_export*.json
+
+# Changelog generado (mantener solo el oficial)
+# CHANGELOG.md
+
+# =====================
+# MANTENER ESTOS ARCHIVOS
+# =====================
+# Nota: Los siguientes archivos SÍ deben estar en el repo
+# !config/bundle.json  (sin API keys)
+# !requirements.txt
+# !README.md
+# !.gitignore
+# !scripts/
+# !templates/
+# !schemas/
+# !dashboard/
+# !documentacion/
+# !.agent/

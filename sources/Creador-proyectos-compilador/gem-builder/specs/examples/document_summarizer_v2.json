@@ -1,0 +1,55 @@
+{
+    "use_case_id": "document_summarizer_v2",
+    "goal": "Resumir documentos de Google Drive con análisis de sentimiento y exportar a markdown",
+    "domain": "document-processing",
+    "users": [
+        "end_user",
+        "analyst",
+        "admin"
+    ],
+    "data_sources": [
+        {
+            "type": "drive",
+            "access": "read",
+            "sensitivity": "confidential",
+            "description": "Documentos confidenciales de proyectos"
+        }
+    ],
+    "actions": [
+        {
+            "type": "read",
+            "side_effects": false,
+            "description": "Leer contenido del documento"
+        },
+        {
+            "type": "analyze",
+            "side_effects": false,
+            "description": "Analizar sentimiento del contenido"
+        },
+        {
+            "type": "summarize",
+            "side_effects": false,
+            "description": "Generar resumen estructurado con insights"
+        },
+        {
+            "type": "write",
+            "side_effects": true,
+            "description": "Escribir resultado a archivo markdown"
+        }
+    ],
+    "output": {
+        "type": "markdown"
+    },
+    "constraints": {
+        "latency_ms": 8000,
+        "cost_tier": "high",
+        "max_tokens": 2000
+    },
+    "security": {
+        "hitl_required": "auto",
+        "read_only": false
+    },
+    "grounding": {
+        "required": true
+    }
+}

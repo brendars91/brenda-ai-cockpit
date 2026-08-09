@@ -1,0 +1,118 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "bundle_meta": {
+        "use_case_id": "BNDL-AGCCE-ULTRA-V4.0-APEX",
+        "version": "4.0.0",
+        "compiled_at": "2026-01-20T10:00:00Z",
+        "compiler_version": "gem-builder-v1.0",
+        "risk_score": 10
+    },
+    "model_routing": {
+        "default_model": "gemini-3-pro",
+        "fallback_model": "gemini-flash",
+        "reasoning_mode": "auto"
+    },
+    "policies": {
+        "knowledge_states": [
+            "HECHO_VERIFICADO",
+            "INFERENCIA",
+            "ASUNCION",
+            "FALTAN_DATOS"
+        ],
+        "model_armor_enabled": true,
+        "hitl_required": false
+    },
+    "system_prompt": {
+        "text": "ACTÚA COMO: Antigravity Core Copilot Engine (AGCCE). \n\nREGLA DE ORO: Plan JSON → RAG Local → Ejecución → Verificación → Evidencia. \n\n1. RAG DETERMINISTA: El código local es la única fuente de verdad. Usa metadatos (path, símbolos) para referenciar hallazgos. \n2. PRE-CHECK OBLIGATORIO: Antes de proponer un cambio, lee los archivos, detecta errores de sintaxis/imports y valida contra el linter/test local. \n3. EMISIÓN DE PLAN: Emite un JSON siguiendo el esquema AGCCE_Plan_v1 antes de cualquier acción. \n4. HITL DE ESCRITURA: Prohibido aplicar 'write/delete' sin aprobación humana del patch mostrado. \n5. EVIDENCIA REPRODUCIBLE: Tu respuesta final DEBE incluir logs de ejecución, tests pasados y la ruta de los archivos analizados. \n\nExpertise: Sistemas distribuidos, Docker Compose, Python Runtime y Análisis Estático de Código.",
+        "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tokens_approx": 200,
+        "sections": [
+            "ROLE",
+            "RULES",
+            "EXPERTISE"
+        ]
+    },
+    "tools": {
+        "contracts": [
+            {
+                "name": "mcp_filesystem_rag",
+                "description": "Semantic search and read capability via MCP",
+                "side_effects": false,
+                "dry_run_default": false,
+                "timeout_ms": 30000,
+                "permissions": [
+                    "read"
+                ]
+            },
+            {
+                "name": "docker_executor_workflow",
+                "description": "Isolated verification via Docker",
+                "side_effects": true,
+                "dry_run_default": true,
+                "timeout_ms": 60000,
+                "permissions": [
+                    "write",
+                    "read"
+                ]
+            },
+            {
+                "name": "python_validator",
+                "description": "Static code analysis",
+                "side_effects": false,
+                "dry_run_default": false,
+                "timeout_ms": 15000,
+                "permissions": [
+                    "read"
+                ]
+            },
+            {
+                "name": "git_local",
+                "description": "Version control operations",
+                "side_effects": true,
+                "dry_run_default": true,
+                "timeout_ms": 10000,
+                "permissions": [
+                    "write",
+                    "read"
+                ]
+            }
+        ]
+    },
+    "knowledge_plan": {
+        "grounding": "rag",
+        "allowed_sources": [
+            "Local Repository",
+            "Official Web Documentation"
+        ]
+    },
+    "verifier": {
+        "verified": true,
+        "checks": [
+            "plan_json_schema_v1",
+            "pre_flight_check_success",
+            "hitl_token_present_for_write",
+            "schema",
+            "grounding",
+            "security"
+        ],
+        "checks_passed": [
+            "plan_json_schema_v1",
+            "pre_flight_check_success"
+        ],
+        "warnings_count": 0,
+        "verified_at": "2026-01-20T10:00:00Z"
+    },
+    "observability": {
+        "metrics": [
+            "tokens",
+            "latency_p50",
+            "tool_success_rate",
+            "validation_fail_rate"
+        ]
+    },
+    "eval_suite": {
+        "golden_set": [],
+        "edge_cases": [],
+        "attacks": []
+    }
+}

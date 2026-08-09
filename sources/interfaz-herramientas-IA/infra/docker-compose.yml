@@ -1,0 +1,10 @@
+# Infrastructure placeholder
+version: '3.8'
+
+services:
+  cockpit:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ..:/app
+    command: ['pnpm', 'start']

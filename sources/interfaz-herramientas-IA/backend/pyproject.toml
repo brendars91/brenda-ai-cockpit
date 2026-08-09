@@ -1,0 +1,39 @@
+[project]
+name = "cockpit-backend"
+version = "0.0.1"
+description = "Python control plane backend for the unified multi-agent cockpit"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.12.0",
+  "opentelemetry-api>=1.39.0",
+  "fastapi>=0.116.0",
+  "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=9.0.0",
+  "pytest-cov>=7.0.0",
+  "ruff>=0.14.0",
+  "mypy>=1.19.0",
+  "httpx>=0.28.0",
+  "pytest-asyncio>=1.1.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["cockpit_core", "cockpit_web"]

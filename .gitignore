@@ -1,0 +1,15 @@
+# local runtime
+local-vars
+*.local
+# dependencies/build
+node_modules/
+dist/
+build/
+.next/
+coverage/
+htmlcov/
+# logs/caches
+*.log
+__pycache__/
+.pytest_cache/
+.venv/

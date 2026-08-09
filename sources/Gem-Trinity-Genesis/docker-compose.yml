@@ -1,0 +1,149 @@
+version: '3.8'
+
+# ========================================
+# Gem Trinity Genesis - Stack Simplificado
+# Oracle Cloud Infrastructure (ARM64)
+# Sin Ollama (para ahorrar espacio en disco)
+# ========================================
+
+services:
+  # ============ Backend API ============
+  gem-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gem-trinity-backend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    ports:
+      - "8000:8000"
+    environment:
+      # API Configuration
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+
+      # CORS - Permitir frontend
+      - CORS_ORIGINS=http://localhost:3000,http://100.69.240.73:3000,https://app-eta-fawn-42.vercel.app
+
+      # Google AI (desde archivo .env)
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_MODEL=${GOOGLE_MODEL:-gemini-2.0-flash-exp}
+
+      # GitHub Sync
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO}
+
+      # Snyk Security
+      - SNYK_TOKEN=${SNYK_TOKEN}
+
+      # Composio/RUBE
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY}
+
+      # n8n Integration
+      - N8N_HOST=n8n
+      - N8N_PORT=5678
+      - N8N_WEBHOOK_URL=http://n8n:5678
+
+      #Ollama Integration (usar el que ya existe en el host)
+      - OLLAMA_HOST=host.docker.internal
+      - OLLAMA_PORT=11434
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+    volumes:
+      # Persistencia de datos
+      - ./artifacts:/app/artifacts
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+      - ./resources:/app/resources
+      - ./modules:/app/modules
+      - ./config:/app/config
+
+    networks:
+      - gem-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ============ n8n Automation ============
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://100.69.240.73:5678/
+      - GENERIC_TIMEZONE=Europe/Madrid
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-change-this-secure-key}
+
+      # Persistent Data
+      - N8N_USER_FOLDER=/home/node/.n8n
+
+      # External Services
+      - N8N_AVAILABLE_BINARY_DATA_MODES=filesystem
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - gem-network
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============ Cloudflare Tunnel ============
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_METRICS=0.0.0.0:2000
+    depends_on:
+      - gem-backend
+    networks:
+      - gem-network
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:2000/metrics" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+# ============ Networks ============
+networks:
+  gem-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============ Volumes ============
+volumes:
+  n8n_data:
+    driver: local

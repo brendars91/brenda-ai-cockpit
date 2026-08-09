@@ -1,0 +1,296 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://agcce.local/schemas/AGCCE_Plan_v1.schema.json",
+    "title": "AGCCE Plan v1",
+    "description": "Schema para planes de ejecución del Antigravity Core Copilot Engine",
+    "type": "object",
+    "required": [
+        "plan_id",
+        "version",
+        "created_at",
+        "objective",
+        "steps"
+    ],
+    "properties": {
+        "plan_id": {
+            "type": "string",
+            "pattern": "^PLAN-[A-Z0-9]{8}$",
+            "description": "Identificador único del plan (formato: PLAN-XXXXXXXX)"
+        },
+        "version": {
+            "type": "string",
+            "enum": [
+                "1.0",
+                "1.1"
+            ],
+            "description": "Versión del schema del plan"
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp de creación del plan"
+        },
+        "objective": {
+            "type": "object",
+            "required": [
+                "description",
+                "success_criteria"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "minLength": 10,
+                    "description": "Descripción clara del objetivo"
+                },
+                "success_criteria": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "Criterios medibles de éxito"
+                },
+                "affected_files": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Lista de archivos que serán modificados"
+                }
+            }
+        },
+        "pre_flight_check": {
+            "type": "object",
+            "properties": {
+                "git_status": {
+                    "type": "string",
+                    "enum": [
+                        "clean",
+                        "dirty",
+                        "pending_review"
+                    ],
+                    "description": "Estado del repositorio git"
+                },
+                "untracked_files": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lint_passed": {
+                    "type": "boolean"
+                },
+                "tests_passed": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "steps": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "action",
+                    "target"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^S[0-9]{2}$",
+                        "description": "ID único del paso (formato: S01, S02, etc.)"
+                    },
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "read_file",
+                            "write_file",
+                            "delete_file",
+                            "run_command",
+                            "docker_compose_up",
+                            "docker_run_tests",
+                            "docker_fetch_logs",
+                            "lint_check",
+                            "type_check",
+                            "snyk_scan",
+                            "git_commit"
+                        ],
+                        "description": "Tipo de acción a ejecutar"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "Archivo, comando o recurso objetivo"
+                    },
+                    "script": {
+                        "type": "string",
+                        "description": "Script asociado (para acciones Docker)"
+                    },
+                    "depends_on": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "IDs de pasos que deben completarse primero"
+                    },
+                    "hitl_required": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Requiere aprobación humana"
+                    },
+                    "expected_outcome": {
+                        "type": "string",
+                        "description": "Resultado esperado del paso"
+                    },
+                    "rollback": {
+                        "type": "string",
+                        "description": "Acción de rollback si falla"
+                    }
+                }
+            },
+            "minItems": 1
+        },
+        "verification": {
+            "type": "object",
+            "properties": {
+                "method": {
+                    "type": "string",
+                    "enum": [
+                        "automated",
+                        "manual",
+                        "hybrid"
+                    ]
+                },
+                "commands": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "expected_results": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "evidence": {
+            "type": "object",
+            "properties": {
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "screenshots": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "test_results": {
+                    "type": "object"
+                },
+                "analyzed_paths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "commit_proposal": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "feat",
+                        "fix",
+                        "docs",
+                        "refactor",
+                        "test",
+                        "chore"
+                    ]
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "security_analysis": {
+            "type": "object",
+            "description": "Análisis de seguridad proactivo (Security Guardian v4.0)",
+            "properties": {
+                "analyzed_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "assumptions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Suposiciones de seguridad del código"
+                },
+                "attack_vectors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "likelihood": {
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "critical"
+                                ]
+                            },
+                            "impact": {
+                                "type": "string",
+                                "enum": [
+                                    "low",
+                                    "medium",
+                                    "high",
+                                    "critical"
+                                ]
+                            }
+                        }
+                    },
+                    "description": "Vectores de ataque identificados"
+                },
+                "mitigations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Mitigaciones propuestas"
+                },
+                "validation_tests": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Tests PoC para validar seguridad"
+                },
+                "security_score": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Puntuación de seguridad (100 = sin riesgos)"
+                }
+            }
+        }
+    }
+}

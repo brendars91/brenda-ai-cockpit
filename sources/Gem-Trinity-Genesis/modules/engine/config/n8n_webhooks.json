@@ -1,0 +1,15 @@
+{
+    "PLAN_VALIDATED": "",
+    "EXECUTION_ERROR": "",
+    "EVIDENCE_READY": "",
+    "SECURITY_BREACH_ATTEMPT": "",
+    "HIGH_LATENCY_THRESHOLD": "",
+    "HITL_TIMEOUT": "",
+    "_comment": "Reemplaza las URLs vacias con tus webhooks de n8n",
+    "_instructions": {
+        "step_1": "Importa los workflows de n8n/ en tu instancia n8n",
+        "step_2": "Activa cada workflow para obtener la URL del webhook",
+        "step_3": "Copia las URLs aqui en los campos correspondientes",
+        "example": "https://tu-n8n.com/webhook/agcce-evidence-ready"
+    }
+}

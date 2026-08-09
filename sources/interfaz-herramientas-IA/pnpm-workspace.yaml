@@ -1,0 +1,6 @@
+packages:
+  - 'cockpit'
+  - 'packages/*'
+  - 'packages/adapters/*'
+  - 'orchestrator'
+  - 'obsidian-plugin'

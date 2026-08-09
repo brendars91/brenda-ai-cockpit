@@ -1,0 +1,24 @@
+{
+    "recommended_mcps": {
+        "filesystem": {
+            "rationale": "Required to read local schemas (grounding) and save the final spec file.",
+            "required_tools": [
+                "read_file",
+                "list_directory"
+            ]
+        },
+        "sequential-thinking": {
+            "rationale": "Critical for the PRD and Spec phases to break down complex requirements into atomic steps.",
+            "required_tools": [
+                "sequentialthinking"
+            ]
+        },
+        "write-file": {
+            "rationale": "Allows the Architect to save the 'use_case_spec.json' directly to the user's disk.",
+            "required_tools": [
+                "write_to_file"
+            ]
+        }
+    },
+    "config_notes": "Ensure the filesystem MCP has access to the 'schemas' directory relative to the agent execution path."
+}
