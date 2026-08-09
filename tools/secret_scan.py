@@ -10,8 +10,9 @@ patterns = {
 }
 allow = ('<REDACTED', 'example', 'EXAMPLE', 'placeholder', 'dummy', 'xxxx', 'fake')
 findings=[]
+excluded_dirs = {'.git', 'node_modules', '.venv', 'venv', '__pycache__', 'dist', 'build', '.next', 'coverage', 'test-results', 'playwright-report'}
 for p in root.rglob('*'):
-    if not p.is_file() or '.git' in p.parts:
+    if not p.is_file() or excluded_dirs.intersection(p.parts):
         continue
     try:
         if p.stat().st_size > 2_000_000:
