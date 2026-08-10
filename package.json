@@ -1,0 +1,28 @@
+{
+  "name": "brenda-ai-cockpit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/policy && npm run build --workspace @cockpit/quota-governor && npm run typecheck --workspace @cockpit/cockpit-web",
+    "verify": "python3 tools/secret_scan.py . && python3 tools/validate_repo.py && npm run typecheck && npm run test && npm run build",
+    "cockpit-pages-build": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/cockpit-web"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/ui": "^4.1.10",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "better-sqlite3": "^13.0.3",
+    "zod": "^4.4.3"
+  }
+}

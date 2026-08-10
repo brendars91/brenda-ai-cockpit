@@ -1,0 +1,262 @@
+[
+  {
+    "tool_name": "terminal",
+    "call_count": 11909,
+    "sessions_used_in": 341
+  },
+  {
+    "tool_name": "read_file",
+    "call_count": 2929,
+    "sessions_used_in": 285
+  },
+  {
+    "tool_name": "write_file",
+    "call_count": 1944,
+    "sessions_used_in": 214
+  },
+  {
+    "tool_name": "patch",
+    "call_count": 1706,
+    "sessions_used_in": 152
+  },
+  {
+    "tool_name": "search_files",
+    "call_count": 1619,
+    "sessions_used_in": 186
+  },
+  {
+    "tool_name": "execute_code",
+    "call_count": 1369,
+    "sessions_used_in": 129
+  },
+  {
+    "tool_name": "todo",
+    "call_count": 1062,
+    "sessions_used_in": 134
+  },
+  {
+    "tool_name": "skill_view",
+    "call_count": 795,
+    "sessions_used_in": 217
+  },
+  {
+    "tool_name": "process",
+    "call_count": 663,
+    "sessions_used_in": 47
+  },
+  {
+    "tool_name": "web_search",
+    "call_count": 614,
+    "sessions_used_in": 102
+  },
+  {
+    "tool_name": "web_extract",
+    "call_count": 274,
+    "sessions_used_in": 81
+  },
+  {
+    "tool_name": "memory",
+    "call_count": 227,
+    "sessions_used_in": 71
+  },
+  {
+    "tool_name": "cronjob",
+    "call_count": 189,
+    "sessions_used_in": 61
+  },
+  {
+    "tool_name": "skill_manage",
+    "call_count": 158,
+    "sessions_used_in": 49
+  },
+  {
+    "tool_name": "session_search",
+    "call_count": 151,
+    "sessions_used_in": 34
+  },
+  {
+    "tool_name": "browser_navigate",
+    "call_count": 136,
+    "sessions_used_in": 27
+  },
+  {
+    "tool_name": "clarify",
+    "call_count": 105,
+    "sessions_used_in": 45
+  },
+  {
+    "tool_name": "delegate_task",
+    "call_count": 93,
+    "sessions_used_in": 44
+  },
+  {
+    "tool_name": "browser_console",
+    "call_count": 68,
+    "sessions_used_in": 8
+  },
+  {
+    "tool_name": "vision_analyze",
+    "call_count": 66,
+    "sessions_used_in": 9
+  },
+  {
+    "tool_name": "mcp__exa_search__web_search_exa",
+    "call_count": 50,
+    "sessions_used_in": 21
+  },
+  {
+    "tool_name": "browser_click",
+    "call_count": 46,
+    "sessions_used_in": 12
+  },
+  {
+    "tool_name": "fact_store",
+    "call_count": 41,
+    "sessions_used_in": 19
+  },
+  {
+    "tool_name": "browser_vision",
+    "call_count": 31,
+    "sessions_used_in": 5
+  },
+  {
+    "tool_name": "mcp_t3mp3st_arsenal_status",
+    "call_count": 26,
+    "sessions_used_in": 3
+  },
+  {
+    "tool_name": "browser_snapshot",
+    "call_count": 20,
+    "sessions_used_in": 8
+  },
+  {
+    "tool_name": "mcp__t3mp3st__arsenal_status",
+    "call_count": 19,
+    "sessions_used_in": 15
+  },
+  {
+    "tool_name": "skills_list",
+    "call_count": 13,
+    "sessions_used_in": 11
+  },
+  {
+    "tool_name": "send_message",
+    "call_count": 13,
+    "sessions_used_in": 3
+  },
+  {
+    "tool_name": "mcp_exa_search_web_search_exa",
+    "call_count": 12,
+    "sessions_used_in": 7
+  },
+  {
+    "tool_name": "mcp_exa_search_web_search_advanced_exa",
+    "call_count": 8,
+    "sessions_used_in": 3
+  },
+  {
+    "tool_name": "mcp__pliny_stack__pliny_read_file",
+    "call_count": 7,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "tool_describe",
+    "call_count": 5,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp__pliny_stack__pliny_list_repos",
+    "call_count": 5,
+    "sessions_used_in": 5
+  },
+  {
+    "tool_name": "mcp__t3mp3st__security_recon",
+    "call_count": 4,
+    "sessions_used_in": 3
+  },
+  {
+    "tool_name": "browser_scroll",
+    "call_count": 4,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp_exa_search_get_prompt",
+    "call_count": 3,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "tool_search",
+    "call_count": 2,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "text_to_speech",
+    "call_count": 2,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp__t3mp3st__request_scope_receipt",
+    "call_count": 2,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp__t3mp3st__approve",
+    "call_count": 2,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp__pliny_stack__pliny_search",
+    "call_count": 2,
+    "sessions_used_in": 2
+  },
+  {
+    "tool_name": "mcp__n8n_mcp__n8n_list_workflows",
+    "call_count": 2,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp__n8n_mcp__get_node",
+    "call_count": 2,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "browser_press",
+    "call_count": 2,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp_exa_search_list_resources",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp_exa_search_list_prompts",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp__t3mp3st__pending_approvals",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp__pliny_stack__pliny_repo_status",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "mcp__exa_search__web_search_advanced_exa",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "fact_feedback",
+    "call_count": 1,
+    "sessions_used_in": 1
+  },
+  {
+    "tool_name": "browser_type",
+    "call_count": 1,
+    "sessions_used_in": 1
+  }
+]

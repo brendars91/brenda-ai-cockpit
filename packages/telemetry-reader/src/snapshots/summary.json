@@ -1,0 +1,9 @@
+{
+  "generated_at": "2026-08-10T08:23:13.380936",
+  "total_sessions": 200,
+  "total_cost_tracked": 22.384498750000002,
+  "total_tool_calls": 26407,
+  "total_cron_executions": 887,
+  "total_evidence_events": 19,
+  "total_facts": 50
+}
