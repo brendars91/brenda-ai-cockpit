@@ -1,0 +1,154 @@
+[
+  {
+    "id": 34,
+    "created_at": "2026-08-10T06:00:30.527214+00:00",
+    "session_id": "20260809_175744_214809",
+    "command": "PAGES_BASE=/brenda-learning-lab/ npm run build 2>&1 | tail -8; echo \"EXIT: ${PIPESTATUS[0]}\"",
+    "canonical_command": "npm run build",
+    "kind": "build"
+  },
+  {
+    "id": 33,
+    "created_at": "2026-08-10T05:59:20.471357+00:00",
+    "session_id": "20260809_175744_214809",
+    "command": "npm run build 2>&1 | tail -8; echo \"EXIT: ${PIPESTATUS[0]}\"",
+    "canonical_command": "npm run build",
+    "kind": "build"
+  },
+  {
+    "id": 32,
+    "created_at": "2026-08-09T18:02:52.904159+00:00",
+    "session_id": "20260809_175744_214809",
+    "command": "rtk npm run build --workspace @brenda-learning/learning-content && rtk npm run build --workspace @brenda-learning/progress-engine && rtk npm run build --workspace @brenda-learning/sql-lab && rtk npm run build --workspace @brenda-learning/quiz-lab && npm run build --workspace @brenda-learning/learner-web 2>&1 | tail -10",
+    "canonical_command": "npm run build",
+    "kind": "build"
+  },
+  {
+    "id": 31,
+    "created_at": "2026-08-09T17:53:36.938070+00:00",
+    "session_id": "20260809_175744_214809",
+    "command": "rtk npm run build --workspace @brenda-learning/learning-content && rtk npm run build --workspace @brenda-learning/progress-engine && rtk npm run build --workspace @brenda-learning/sql-lab && rtk npm run build --workspace @brenda-learning/quiz-lab && npm run build --workspace @brenda-learning/learner-web 2>&1 | tail -15",
+    "canonical_command": "npm run build",
+    "kind": "build"
+  },
+  {
+    "id": 30,
+    "created_at": "2026-08-09T17:34:49.401268+00:00",
+    "session_id": "20260809_175744_214809",
+    "command": "npm run typecheck 2>&1 | tail -20",
+    "canonical_command": "npm run typecheck",
+    "kind": "typecheck"
+  },
+  {
+    "id": 29,
+    "created_at": "2026-08-02T06:43:51.753704+00:00",
+    "session_id": "20260802_083228_273617",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-clean-pr-coverage.json && git diff --unified=0 --diff-filter=ACMRT origin/main...HEAD -- '*.py' > /tmp/hermes-clean-pr-python.diff && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-clean-pr-coverage.json --diff-file /tmp/hermes-clean-pr-python.diff --fail-under 100 && coverage erase && git status --short --branch",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 28,
+    "created_at": "2026-08-02T06:42:05.499756+00:00",
+    "session_id": "20260802_083228_273617",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-clean-pr-coverage.json && git diff --unified=0 --diff-filter=ACMRT origin/main...HEAD -- '*.py' > /tmp/hermes-clean-pr-python.diff && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-clean-pr-coverage.json --diff-file /tmp/hermes-clean-pr-python.diff --fail-under 100 && coverage erase",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 27,
+    "created_at": "2026-08-02T06:39:50.893464+00:00",
+    "session_id": "20260802_083228_273617",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-clean-pr-coverage.json && git diff --unified=0 --diff-filter=ACMRT origin/main...HEAD -- '*.py' > /tmp/hermes-clean-pr-python.diff && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-clean-pr-coverage.json --diff-file /tmp/hermes-clean-pr-python.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 26,
+    "created_at": "2026-08-02T06:30:46.603036+00:00",
+    "session_id": "20260802_080417_c7aee5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-pr-coverage.json && git diff --unified=0 --diff-filter=ACMRT origin/main...HEAD -- '*.py' > /tmp/hermes-pr-python.diff && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-pr-coverage.json --diff-file /tmp/hermes-pr-python.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 25,
+    "created_at": "2026-08-02T06:24:17.343178+00:00",
+    "session_id": "20260802_080417_c7aee5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-coverage.json && python /tmp/make_diff_with_untracked.py && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-coverage.json --diff-file /tmp/hermes-python-with-untracked.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 24,
+    "created_at": "2026-08-02T06:23:20.435363+00:00",
+    "session_id": "20260802_080417_c7aee5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-coverage.json && python /tmp/make_diff_with_untracked.py && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-coverage.json --diff-file /tmp/hermes-python-with-untracked.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 23,
+    "created_at": "2026-08-02T06:21:06.583587+00:00",
+    "session_id": "20260802_080417_c7aee5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-coverage.json && python /tmp/make_diff_with_untracked.py && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-coverage.json --diff-file /tmp/hermes-python-with-untracked.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 22,
+    "created_at": "2026-08-02T06:18:06.270854+00:00",
+    "session_id": "20260802_080417_c7aee5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_safe_change_runner.py tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 21,
+    "created_at": "2026-08-01T19:17:37.341950+00:00",
+    "session_id": "20260801_204355_c87ec5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q && coverage combine && coverage json -o /tmp/hermes-coverage.json && git diff --unified=0 --diff-filter=ACMRT -- pyproject.toml scripts/ci/changed_line_coverage_gate.py scripts/ci/engineering_quality_audit.py scripts/run_tests_parallel.py tests/test_coverage_gates.py tests/test_engineering_quality_audit.py > /tmp/hermes-python.diff && python scripts/ci/changed_line_coverage_gate.py --coverage-json /tmp/hermes-coverage.json --diff-file /tmp/hermes-python.diff --fail-under 100",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 20,
+    "created_at": "2026-08-01T19:14:03.582667+00:00",
+    "session_id": "20260801_204355_c87ec5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 19,
+    "created_at": "2026-08-01T19:12:42.988895+00:00",
+    "session_id": "20260801_204355_c87ec5",
+    "command": "source /home/ubuntu/.hermes/hermes-agent/venv/bin/activate && coverage erase && scripts/run_tests.sh --coverage tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 18,
+    "created_at": "2026-08-01T19:10:54.853316+00:00",
+    "session_id": "20260801_204355_c87ec5",
+    "command": "scripts/run_tests.sh --coverage tests/test_engineering_quality_audit.py tests/test_coverage_gates.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 17,
+    "created_at": "2026-08-01T18:41:46.321307+00:00",
+    "session_id": "20260801_184625_0bdda13e",
+    "command": "scripts/run_tests.sh tests/test_engineering_quality_audit.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  },
+  {
+    "id": 16,
+    "created_at": "2026-08-01T18:40:58.069177+00:00",
+    "session_id": "20260801_184625_0bdda13e",
+    "command": "scripts/run_tests.sh tests/test_engineering_quality_audit.py -q",
+    "canonical_command": "scripts/run_tests.sh",
+    "kind": "test"
+  }
+]

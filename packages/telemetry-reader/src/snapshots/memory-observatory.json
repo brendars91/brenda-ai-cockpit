@@ -1,0 +1,352 @@
+[
+  {
+    "fact_id": 1,
+    "content": "DISCORD BOTONES APPROVAL: DISCORD_ALLOWED_USERS debe ser IDs planos separados por comas (no JSON array). Bug: si tiene formato [\"123\"], _clean_discord_id no lo parsea y los botones siempre dicen \"not authorized\". Fix aplicado en .env de OCI.",
+    "category": "general",
+    "trust_score": 0.55,
+    "tags": ""
+  },
+  {
+    "fact_id": 2,
+    "content": "HERMES ACCESO REMOTO (actualizado 18-Jul): OCI = gemini-arm-node-01, Tailscale 100.69.240.73. Tailscale SSH enabled (RunSSH=true). Windows node 'knbmc' online en Tailscale 100.115.147.83; alias 'ssh oci' configurado hacia gemini-arm-node-01.tail22d85a.ts.net/ubuntu. Todo el estado vive en OCI. Discord=ventana r\u00e1pida, terminal=trabajo serio. Ver fact 36 para detalle de hardening de acceso.",
+    "category": "general",
+    "trust_score": 0.65,
+    "tags": ""
+  },
+  {
+    "fact_id": 3,
+    "content": "CONFIG/AUTH OCI (verificado 18-Jul-2026): provider=zai, model=glm-5.2 READY (temp 0.2, ctx 1M). Aux vision=glm-4.6v. Codex OAuth ACTIVO (gpt-5.5, fallback_providers confirmado en config.yaml). Anthropic OAuth credential pool activo (haiku/sonnet/opus). Skills: hermes-provider-troubleshooting + glm-model-optimization + vision-orchestrator.",
+    "category": "general",
+    "trust_score": 0.7,
+    "tags": ""
+  },
+  {
+    "fact_id": 4,
+    "content": "LECCI\u00d3N CR\u00cdTICA \u2014 DOCUMENTOS LEGAL-ADMINISTRATIVOS: Nunca citar art\u00edculos de ley de memoria o por inferencia de web search. Cada cita debe verificarse contra BOE directamente (boe.es/buscar/act.php). En jun-2026 Brenda pidi\u00f3 un escrito vecinal y se cometieron 6 errores jur\u00eddicos graves (art. 46 vs 50 RGCir, art. 25.2.f vs g LBRL, BOE 290 vs 291, art. 49 CE pre-reforma-2024, fundamento art. 13 vs 14/16/21/66 Ley 39/2015, afirmaciones categ\u00f3ricas sin prueba). Otra IA lo hizo bien. Skill creada: `legal-administrative-documents`. Protocolo: verificaci\u00f3n cita-por-cita contra fuente primaria + tono prudente en afirmaciones f\u00e1cticas + art. 66 desde el inicio + petici\u00f3n subsidiaria + anexo de evidencias.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 6,
+    "content": "NIVEL DE EXIGENCIA DE BRENDA: No hay que decirle que verifique o que no invente \u2014 se asume. Cero tolerancia a fallos en tareas delicadas. Un solo error de cita desacredita todo el trabajo. La eficacia debe ser excepcional por defecto, no un objetivo a alcanzar. /advisor debe activarse siempre que se use. El modo constructor de prompts debe activarse con \"mej\u00f3ralo\" etc. Estas son b\u00e1sicas, no opcionales.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 9,
+    "content": "VISI\u00d3N MULTIMODAL OCI (20-Jun-2026): GLM-5.2 es text-only. Aux vision cambiado a glm-4.6v (glm-5v-turbo NO accesible con Coding Plan Lite, error 429). Skills creadas: vision-orchestrator, vision-preprocessor, vision-consensus, vision-reasoner. Patr\u00f3n orquestador+visi\u00f3n supera VLMs nativos.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 12,
+    "content": "COGNITIVE ENGINE v1.0 (21-Jun): Sistema cognitivo de 8 capas construido y testeado. Skills creadas: cognitive-router, compound-tools, agent-as-judge, cognitive-engine (maestra). Scripts: vault-rag-retrieve.py, moa-decide.py (125s, 3 modelos+GLM sintetiza), self-consistency.py, karpathy-loop.py. Hooks: exec-feedback.py (post_tool_call, verifica .py/.sh/.json/.yaml tras write_file/patch). Karpathy Loop: 7 experimentos registrados, 6 al 100%, self-consistency mejorable (extract_final_answer no captura post-</think> de Phi4). Pendiente ampliar vault (12 notas indexadas, 4 hu\u00e9rfanas) y paralelizar MoA (threading).",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 13,
+    "content": "AGENTOS (22-Jun): Terminal unificada montada. Script `agentos` en ~/.local/bin crea sesi\u00f3n tmux con 3 ventanas: (1) 3 panes Hermes+Claude Code+Codex, (2) Monitor sistema, (3) Shell libre. Contexto compartido: ~/workspace/{AGENTS.md,CLAUDE.md,GEMINI.md}. Dashboards: WebUI :8787 + Dashboard integrado :9119. Claude Code v2.1.177 + Codex CLI v0.139.0 instalados. 7 profiles Hermes activos. Pipeline v3 completo (6 skills hermes-*). Para usar: SSH \u2192 `agentos` \u2192 tmux attach.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 14,
+    "content": "PATCHES: 4 scripts apply_*_patch.py en ~/.hermes/scripts re-aplican hardening tras cada hermes update. Rama local-hardening-patches versiona los cambios. apply_redact_patch.py reescrito 2026-07-07 con anclas estructurales (paren-depth + string-aware) y dot escapado fix. Skill: hermes-patch-management. Patr\u00f3n: fetch/reset main -> aplicar scripts -> recrear branch -> restart -> sentinels+tests.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 15,
+    "content": "Claude Code hardening completado 7-Jul-2026: Fable 5 audit\u00f3 CC de Brenda (sesi\u00f3n d8fed8a9, cortada por l\u00edmite), Hermes ejecut\u00f3 plan completo. Hooks nuevos (catastrophe-guard + verify-write), modelo fable-5 reemplazado por sonnet-4-6, 8 agentes reescritos sin skills fantasma + verify.md nuevo, CLAUDE.md corregido, AGENTS.md creado, evals 31/31 pasan, executor dise\u00f1ado.",
+    "category": "project",
+    "trust_score": 0.5,
+    "tags": "claude-code, hardening, harness, fable5"
+  },
+  {
+    "fact_id": 16,
+    "content": "Claude Code Executor implementado 7-Jul-2026: skill claude-code-executor en ~/.hermes/skills/devops/ + script ~/.hermes/scripts/claude_code_executor.py (11KB, verificado). Invoca claude -p --output-format json con DoD verificable, maneja 429/permission_denials, y --verify lanza verificacion adversarial en contexto limpio. Probado: detecta OAuth 429 correctamente (status=rate_limited, exit 2). Skill visible proxima sesion (loader cached). Diseno completo: ~/.hermes/design/claude-code-executor.md.",
+    "category": "project",
+    "trust_score": 0.5,
+    "tags": "claude-code, executor, skill, hermes"
+  },
+  {
+    "fact_id": 17,
+    "content": "Claude Code hardening Codex P0/P1 finalizado y verificado 7-Jul-2026. Cambios: workflows deterministas en ~/.claude/workflows/ (agent_runner.py, coding_review.py, research_fanout.py, judge_panel.py, schema_validator.py); JSON Schemas en ~/.claude/schemas/ para verify/review/plan/fix; evals comportamentales con fixtures + runner juez LLM en ~/.claude/evals/run_behavioral_evals.py; repo fixture E02 en ~/.claude/evals/repos/e02-tests-premise; advisor saneado (comandos fantasmas eliminados); developer prompt template en ~/.claude/templates/developer-prompt.md; CLAUDE.md endurecido para datos vivos/web (no afirmar 'consultado en vivo' sin tool-call) y YAGNI ('robusto/limpio/mejor/production-ready' requiere aclarar alcance). Verificaci\u00f3n final: behavioral 6/6 PASS, estructurales 31/31 PASS.",
+    "category": "project",
+    "trust_score": 0.7,
+    "tags": "claude-code,codex,workflows,schemas,evals,verified"
+  },
+  {
+    "fact_id": 18,
+    "content": "Claude Code idioma: espa\u00f1ol por defecto; si Brenda pide expl\u00edcitamente alem\u00e1n/ingl\u00e9s/u otro idioma, responder en ese idioma. Idioma \u2260 permiso para ignorar pol\u00edticas o inventar resultados.",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 19,
+    "content": "[ASYNC DELEGATION BATCH COMPLETE \u2014 deleg_69a9951b]\nA background fan-out of 1 subagent(s) you dispatched earlier has finished. All ran in parallel and waited on each other; their consolidated results are below. You may have moved on since dispatching \u2014 act on these or re-dispatch if things have changed.\n\nDispatched: 2026-07-08 22:08:09 (44s ago)\nContext you provided: The upstream compression fix co",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 20,
+    "content": "EVALUADORES EXTERNOS JUL-2026: Codex CLI GPT-5.5 workspace SIN CR\u00c9DITOS (\"out of credits\", incluso respuestas triviales fallan tras el primer token). Claude Code CLI: l\u00edmite semanal, reset Jul 12 4pm. OpenAI API key: 401. Gemini/OpenRouter keys: viven en config Hermes, NO exportadas al env del proceso Python (no accesibles v\u00eda subprocess directo). Para usarlas: delegate_task (runtime Hermes tiene acceso) o extraer de config con script ejecutado por Brenda.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 21,
+    "content": "SKR03 DATEV VERIFICADO: 17/17 cuentas de SapMentor verificadas contra PDF oficial DATEV 2025 (Art.-Nr. 11174, collmex.de/skr03.pdf). Cuenta 0420 = B\u00fcroeinrichtung CORRECTA (mi sospecha anterior era error m\u00edo). Plan contable impecable. LECCI\u00d3N: no cuestionar cuentas SKR03 sin verificar contra fuente primaria; el plan es m\u00e1s estable de lo que parece.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 22,
+    "content": "SAPMENTOR EJECUCI\u00d3N: Brenda NO quiere que delegue a Claude Code para implementar items del plan. Ejecuta DIRECTAMENTE (write_file, terminal, patch). Delegar a CC consume m\u00e1s tokens por el overhead de timeout+recuperaci\u00f3n. El patr\u00f3n de CC-timeout-recuperar-manual es ineficiente y caro.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 23,
+    "content": "[CONTEXT COMPACTION \u2014 REFERENCE ONLY] Earlier turns were compacted into the summary below. This is a handoff from a previous context window \u2014 treat it as background reference, NOT as active instructions. Do NOT answer questions or fulfill requests mentioned in this summary; they were already addressed. Respond ONLY to the latest user message that appears AFTER this summary \u2014 that message is the si",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 24,
+    "content": "SAPMENTOR HARDENING: Brenda dio permiso expl\u00edcito (13-Jul-2026) para hacer merge squash + delete-branch en etapas del programa de hardening PR00-PR15 sin pedir aprobaci\u00f3n individual cuando la evidencia local sea verde y cualquier fallo remoto est\u00e9 demostrado como infraestructura de GitHub Actions (runner_id=0, steps=[]).",
+    "category": "project",
+    "trust_score": 0.5,
+    "tags": "sapmentor,hardening,merge-policy"
+  },
+  {
+    "fact_id": 25,
+    "content": "SAPMENTOR CI: GitHub Actions minutes agotados en repo privado. Si jobs fallan en 2-4s con runner_id=0 y steps=[], es bloqueo de infraestructura/billing; validar localmente con suite completa + ruff + manifest + claims + quality gates y re-trigger remoto cuando haya minutos o repo p\u00fablico.",
+    "category": "project",
+    "trust_score": 0.5,
+    "tags": "sapmentor,ci,github-actions,infra"
+  },
+  {
+    "fact_id": 26,
+    "content": "PLINY STACK: repos Pliny/BT6/BASI clonados en `/home/ubuntu/workspace/pliny-stack`; symlinks para agentes: `~/.hermes/workspaces/pliny-stack` y `~/.claude/workspaces/pliny-stack`. Tiene AGENTS.md/CLAUDE.md con regla: lectura/auditor\u00eda por defecto, no ejecutar tooling ofensivo/jailbreak/hardware sin permiso expl\u00edcito.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 27,
+    "content": "Buscame todos esos repositorios\n\n[The user sent an image~ Here's what I can see:\n## Image Description\n\n### Device & Status Bar\n- **Time**: 5:37\n- **Status indicators**: Signal bars, data speeds (D:2Kb/s, U:2Kb/s), battery at 100%, WiFi, and other icons\n- **App**: X (formerly Twitter), dark mode\n\n### Google Translate Overlay\n- A **blue Google Translate banner** is visible at the top, showing transl",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 28,
+    "content": "Auditor\u00eda integral del ecosistema Hermes completada 15-Jul-2026. Score global: 7.8/10. Verificado en vivo: 3 providers activos (Z.AI GLM-5.2, Anthropic OAuth v\u00e1lido, Codex GPT-5.5 OAuth), 5 MCPs (4 activos, t3mp3st 48 tools 100% readiness, pliny-stack 16 repos clean), 32 cronjobs todos healthy, VERITAS 84/85 tests pass, Guardian activo bloqueando shell injection, 5 hooks ejecutables, credenciales 0600, delegaci\u00f3n funcional end-to-end. Codex GPT-5.5 evaluaci\u00f3n independiente: 6.4/10 (conservador, evalu\u00f3 sobre descripci\u00f3n no evidencia).",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": "audit, health-check, ecosystem, 2026-07-15"
+  },
+  {
+    "fact_id": 29,
+    "content": "Cron overlap resuelto 15-Jul-2026: Data Flywheel movido de '0 4 * * *' a '5 4 * * *' para evitar colisi\u00f3n con Capabilities Manifest. Workflow C: Auto-Triage movido de '0 */6 * * *' a '5 */6 * * *' para evitar colisi\u00f3n con Hermes Sentinel. Ambos script-only no_agent, impacto m\u00ednimo pero previene picos de CPU/RAM simult\u00e1neos.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": "cron, optimization, 2026-07-15"
+  },
+  {
+    "fact_id": 30,
+    "content": "Hermes Agent v0.18.2 (upstream 6997dc81 + 28 carried commits locales). Stack: GLM-5.2/Z.AI primary (temp 0.2, ctx 1M), Anthropic OAuth credential pool (haiku/sonnet/opus), Codex CLI 0.142.5 con OAuth GPT-5.5. Delegation model: claude-opus-4-8. Memory: holographic (memory_store.db con FTS5). 159 skills totales en 20 categor\u00edas. 7 skill bundles (/advisor /audit /legal /debug /improve /research /architect).",
+    "category": "tool",
+    "trust_score": 0.5,
+    "tags": "version, stack, config"
+  },
+  {
+    "fact_id": 31,
+    "content": "MCP servers activos en Hermes: notebooklm (v3.0.5), exa-search (remote), t3mp3st (48 tools, 45 command-ready, 100% readiness, 0 pending approvals), pliny-stack (16 repos elder-plinius + BASI-LABS, todos clean git status). Engram off por dise\u00f1o. T3mp3st gating: safe_command tools libres, receipt_required necesitan ScopeGuard, catalog_only (metasploit/hydra) bloqueados.",
+    "category": "tool",
+    "trust_score": 0.5,
+    "tags": "mcp, t3mp3st, pliny-stack, arsenal"
+  },
+  {
+    "fact_id": 32,
+    "content": "Seguridad Hermes multicapa verificada 15-Jul-2026: (1) hermes-guardian plugin activo detectando shell injection en tiempo real, (2) VERITAS 3-tier anti-alucinaci\u00f3n con verify_soul_integrity.py 84/85 PASS, (3) 5 hooks Claude Code ejecutables: guard-git, guard-secrets, catastrophe-guard, verify-write, agentos-observer, (4) git core.hooksPath = ~/.claude/git-hooks, (5) credenciales .credentials.json/auth.json/config.yaml todos permisos 0600, (6) t3mp3st scope gates con 0 pending approvals.",
+    "category": "tool",
+    "trust_score": 0.5,
+    "tags": "security, guardian, veritas, hooks"
+  },
+  {
+    "fact_id": 33,
+    "content": "Infraestructura OCI ARM64 (gemini-arm-node-01): Tailscale 100.69.240.73. AgentOS Web dashboard en puerto 8502 (bind Tailscale solo, systemd active, 3 Claude PTYs). Paperclip en :3310 healthy. 11 Docker containers (SapMentor stack: grafana/frontend/prometheus/backend/postgres/redis/qdrant + searxng + portainer + semgrep-mcp + gem-trinity). Disco 46% (89G/194G). RAM 5.9G/23G. Hermes Gateway PID activo (systemd unit obsoleto de junio, gateway corre directo).",
+    "category": "tool",
+    "trust_score": 0.5,
+    "tags": "infrastructure, oci, agentos, docker"
+  },
+  {
+    "fact_id": 34,
+    "content": "Delegaci\u00f3n Hermes verificada funcional 15-Jul-2026: delegate_task despacha subagente (claude-opus-4-8) que puede leer filesystem, ejecutar terminal y reportar. Pipeline end-to-end operativa. Config delegaci\u00f3n: max_children=1, max_spawn_depth=1, orchestrator_enabled=true, inherit_mcp_toolsets=true. Limitaci\u00f3n: paralelismo real restringido por max_children=1.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": "delegation, subagent, coordination"
+  },
+  {
+    "fact_id": 35,
+    "content": "Cronjobs Hermes: 32 totales (30 activos, 2 pausados intencionalmente: Heartbeat Cuatrienal y Sue\u00f1os Nocturnos). Todos reportan last_status=ok. 0 errores de contenido en \u00faltimos 50 outputs. Schedules sin solapamientos tras fix 15-Jul-2026. Cobertura: monitoring (Sentinel cada 6h), maintenance (backup/retention/entropy), intelligence (YT scout/model scout/feature scout), self-improvement (triage/ODSE/flywheel), security (PII/guardian/hygiene/config validator/VERITAS canary).",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": "cronjobs, automation, monitoring"
+  },
+  {
+    "fact_id": 36,
+    "content": "OCI remote access hardening 15-Jul-2026: gemini-arm-node-01 Tailscale SSH enabled (`RunSSH: true` via `sudo tailscale set --ssh=true`). Firewall now explicitly allows inbound `tailscale0` and persisted to `/etc/iptables/rules.v4`. Windows node `knbmc` online at Tailscale IP 100.115.147.83; `tailscale ping knbmc` succeeds. Taildrop sent `/home/ubuntu/oci-windows-bootstrap.ps1` to `knbmc` to configure Windows alias `ssh oci` pointing to `gemini-arm-node-01.tail22d85a.ts.net` / ubuntu. Private-key transfer/manipulation was blocked by hermes-guardian and intentionally not bypassed; preferred path is Tailscale SSH/no private keys.",
+    "category": "tool",
+    "trust_score": 0.5,
+    "tags": "oci, tailscale, ssh, windows, remote-access"
+  },
+  {
+    "fact_id": 37,
+    "content": "CRONJOBS OPS: Watchdog Disco (68280e6c28c0, every 4h, disk_watchdog.py) alerta <10% libre. Hermes Doctor (40011c844a75, daily 6am, hermes_doctor.py) verifica gateway+paperclip+PG+4 patches anti-update, auto-reaplica si update los borr\u00f3. Ambos no_agent, silentes en verde.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 38,
+    "content": "ANTHR\u00d6PIC TOKEN REFRESH (cron 1f214cc54ae2, no_agent): bug cr\u00edtico \"falso verde\" corregido 19-Jul-2026. El script `~/.hermes/scripts/anthropic_token_refresh.py` era SILENTE cuando el refresh fallaba dentro de ventana <4h y ten\u00eda un `except Exception: pass` que se tragaba errores de escritura del improvement-inbox \u2014 caus\u00f3 14 d\u00edas de gateway con token MUERTO (401) sin alertar. Fix aplicado: (1) `emit()` imprime SIEMPRE `token_state:` con el estado real (BEFORE/AFTER remaining_h, NO_CHANGE_AFTER_REFRESH, REFRESH_FAILED, CRITICAL); (2) el path \"token no cambi\u00f3 tras claude headless\" ahora reporta WARN expl\u00edcito; (3) verificaci\u00f3n post-escritura del inbox (`os.path.exists + getsize`) reemplaz\u00f3 al bare except. Backup en `anthropic_token_refresh.py.bak.20260719`. Patr\u00f3n reusable: TODO watchdog no_agent debe imprimir su estado real en cada run, no callarlo.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 39,
+    "content": "PAPERCLIP API (instancia brenda-cloud): corre en 127.0.0.1:3310 + :13310 loopback, systemd `paperclip-brenda-cloud.service`, v0.3.1 (verificado 19-Jul-2026 via /api/health). API: `/api/health` devuelve JSON con status/version/features. `/docs` sirve SPA (200), sin openapi.json p\u00fablico. Tailscale Serve expone UI en https://gemini-arm-node-01.tail22d85a.ts.net:4310. Runbook: ~/ops/runbooks/hermes-paperclip-oci-production-runbook.md. Para MCP custom: wrapper sobre la API HTTP local, no servidor MCP est\u00e1ndar \u2014 endpoints reales se descubren via browser Tailscale o curando /docs.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 40,
+    "content": "SKILL SELF-AUDIT + HUMANIZER: al editar una skill que ense\u00f1a patrones, verificar que su prosa no los viole. Caso aplicado: creative/humanizer (bundled/protected en curator, 15-Jul), 7 parches inline-header\u2192prosa. Pendiente: bump 2.5.1\u21922.6.0; confirmar si GLM-5.2 lo necesita.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 41,
+    "content": "AUTO-MANTENIMIENTO CRON (1db88105b348, every 8h): agente LLM con autonom\u00eda de fix sobre scripts/skills/logs. Recolector: `~/.hermes/scripts/cron_output_collector.py --hours 8` (format_report detecta errores/warnings/issues en outputs de cron + salud del sistema). CAN touch: scripts .py/.sh, SKILL.md (fixes mec\u00e1nicos), logs (rotar >500KB). CANNOT touch: config.yaml, systemd, credenciales, state.db, git, jobs.json, sapmentor-work/, memories/, profiles/. Max 5 fixes/run, backup autom\u00e1tico antes de cada cambio.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 42,
+    "content": "AUTO-APPROVAL GATE (22-Jul-2026): El self-improvement-pipeline ya NO requiere que Brenda apruebe todo. Nuevo gate (`~/.hermes/scripts/auto_approval_gate.py`) clasifica hallazgos en 4 tiers: TIER_0 (auto-aplica estructurales), TIER_1 (auto-aplica + verifica), TIER_2 (adversarial via delegate), TIER_ESCALATE (Brenda). NEVER_AUTO list bloquea config.yaml/credentials/systemd/jobs.json/state.db. Max 10 auto/ciclo, 3 fails consecutivos pausan. Orchestrator actualizado con 3 fases: scan\u2192fix\u2192gate.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 43,
+    "content": "Claude Code now has its own autonomous self-improvement cycle equivalent to Hermes. 8 new scripts in ~/.claude/scripts/: evidence_bus.py, dod_compiler.py, workflow_runner.py (journal+resume), cc_scanner.py, cc_fixer.py, cc_approval_gate.py (4 tiers), cc_fable5.py (20 oracles), cc_orchestrator.py. Cron 40bac5423b5c every 6h (no_agent, deliver=local) triggers FABLE5+orchestrator. CLAUDE.md and AGENTS.md updated. All 20 FABLE5 oracles pass.",
+    "category": "project",
+    "trust_score": 0.5,
+    "tags": "claude-code,self-improvement,harness,auto-approval"
+  },
+  {
+    "fact_id": 44,
+    "content": "espera, te doy la transcripcion...no se porque no podias leerla: \nCap\u00edtulos\n\nTranscripci\u00f3n\nBuscar en el v\u00eddeo\nIntro\n0:00\nHello world. Who said that running an\n0:03\nAPI server to serve LLM to various tools\n0:06\nand plugins must be complicated? Who\n0:08\nsaid you have to deal with configuration\n0:10\nfile JSON files in order to make this\n0:13\nhappen? Today I will show you how you\nWhat Relay AI actuall",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 45,
+    "content": "bueno y por si no leiste la transcripcion del primer video te lo mando para que el plan salga a la perfeccion: \n\nBuscar en el v\u00eddeo\nIntro\n0:00\nHello world. Watch this. That's Google's\n0:03\nlatest anti-gravity 2.0 and it's running\n0:08\nGrock 4.5.\n0:10\nNot Gemini. Grock. Centrics work on\n0:15\nCodeex. And even the new chat GPT app\n0:19\nused to be called Codeex. Now it's\n0:21\nrunning Fable 5. Yes, Cla",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 46,
+    "content": "MODAL: Plan gratis $30/mes, perfil brendars91, token ak- en ~/.modal.toml. CLI instalado en OCI (pip install modal, v1.5.3). 4 servicios desplegados en /home/ubuntu/modal-services/:\n1. Web Fetcher (brenda-web-fetcher): fetch + Playwright + screenshot. IP de AWS/GCP evita bloqueos Oracle Cloud. Endpoints: fetch, fetch_text, screenshot (todos POST con JSON body).\n2. Image Generator (brenda-image-gen): SD 3.5 Large Turbo en GPU T4. Clase ImageGenerator, endpoint generate.\n3. Whisper GPU (brenda-whisper-gpu): Whisper large-v3 en GPU L4. Clase WhisperGPU, endpoint transcribe.\n4. Sandbox x86 (brenda-sandbox-x86): run_code_x86 para cosas que fallan en ARM.\nProxy auth: Bearer wk-hqPkWxyfV58M8dH5AqA57x.ws-wCn0ih2rQGJBfIjJQlgmj1. Modal-fastapi_endpoint requiere JSON body con tipo dict (no query params, que dan 414 en payloads grandes). Deploy: `modal deploy /home/ubuntu/modal-services/<file>.py`. Cold starts: primer call de GPU descarga modelo (~3-10GB, tarda varios minutos),\u540e\u7eed calls son r\u00e1pidos.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 47,
+    "content": "SEMANTICA AUDIT: plugin user `~/.hermes/plugins/semantica-audit`, DB `~/.hermes/semantica-audit/audit.db`, cron health `49eb1acb995f` cada 6h no_agent/silente; pytest seguro: `PYTHONDONTWRITEBYTECODE=1 PATH=~/.hermes/hermes-agent/venv/bin:$PATH python -m pytest tests -q -o addopts=`.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 48,
+    "content": "RELAY-AI: v0.7.6 OCI. systemd USER `relay-ai-server.service` (enabled, linger=yes, auto-restart). 9 providers, 403 modelos. 17645, password var GW17645K. freeModelsOnly:false. OpenAI OAuth: re-auth con `relay-ai providers auth openai-oauth` (device flow). Zhipu directo SIN saldo \u2192 usar `z-ai/glm-5.2` v\u00eda OpenRouter. OpenAI non-streaming falla (useResponsesLite); streaming OK (Claude Code usa stream por defecto). claude-mix wrapper: ~/.local/bin/.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 49,
+    "content": "VALIDADORES HERMES (3 nuevos, 3-Aug-2026): skill_consistency_validator.py + output_integrity_checker.py + catalog_drift_detector.py. Orquestador validate_hermes.py. 22 self-tests verde. Crons: 1aea29421d60 (5:15am) + f0b5a4dd3ec4 (5:20am). Excluye .archive. Adaptados de thehumanintheloop-marketplace-codex (Perera).",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 50,
+    "content": "Brenda consigui\u00f3 un Pflichtpraktikum en Konsultec (Bergisch Gladbach, junto a Bonn). Rol: SAP Business One (NO S/4HANA Finance). Modalidad: REMOTO. Periodo: 7-Julio-2026 a 15-Septiembre-2026 (10 semanas). Fue el \u00daNICO \u00e9xito de su campa\u00f1a de empleo (38+ empresas prospectadas, resto sin oferta). Pflichtpraktikum = pr\u00e1ctica obligatoria vinculada a la Weiterbildung ABAP/DCI.",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": "empleo,sap,konsultec,pflichtpraktikum,alemania,carrera"
+  },
+  {
+    "fact_id": 51,
+    "content": "BRAND ASSET MACHINE: skill productivity/brand-asset-machine/. Logos SVG (Claude), fotograf\u00eda (Pollinations FLUX gratis), motion CSS. Pollinations: `image.pollinations.ai/prompt/{P}?model=flux&nologo=true&seed={S}`.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 52,
+    "content": "STEP 0: INTERVIEW ME (do this first, generate nothing yet)\nAsk me, one round of questions, then confirm your understanding back to me before moving on:\n1. What's the product or business?\n2. Do I have a brand name, or should you pitch me 3 with personality?\n3. What's the vibe? (2-3 adjectives, or a film/place/era I want it to feel like)\nSigo pegando",
+    "category": "user_pref",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 53,
+    "content": "ENGINEERING GOVERNANCE: comando can\u00f3nico `hermes-governance-closeout` instalado en `/home/ubuntu/bin/`; script `/home/ubuntu/.hermes/scripts/hermes_governance_closeout.py`. Pol\u00edtica: R0/R1 warn-only, R2 enforce, R3+ enforce + `--reviewed-by` y `--review-evidence-id`. Skill/ref: senior-engineering-governance \u2192 references/hermes-claude-first-governance.md.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 54,
+    "content": "BACKUP CAN\u00d3NICO OCI: GitHub privados `brendars91/hermes-oci-current` y `brendars91/claude-code-oci-current`, branch `backup-snapshot`, contienen backups sanitizados restaurables de Hermes/Claude Code OCI con `restore.sh`, `bootstrap_ubuntu.sh`, `cloud-init.yaml`, Docker/Compose, `restore-test.sh` y `tools/secret_scan.py`. Duplicados antiguos Hermes/Claude Code borrados 09-Aug-2026.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  },
+  {
+    "fact_id": 55,
+    "content": "REPO CONSOLIDACI\u00d3N DOMINIOS: GitHub privados creados 09-Aug-2026: `brendars91/brenda-ai-cockpit`, `brendars91/brenda-learning-lab`, `brendars91/brenda-creative-ai-apps`, branch `initial/domain-consolidation`. Cada uno incluye fuentes saneadas, README, PRODUCT_SPEC, ARCHITECTURE, MIGRATION_ROADMAP, DELETION_CANDIDATES, `tools/secret_scan.py`, `tools/validate_repo.py` y CI `deterministic-gates`.",
+    "category": "general",
+    "trust_score": 0.5,
+    "tags": ""
+  }
+]
