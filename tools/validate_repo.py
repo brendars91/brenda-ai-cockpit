@@ -10,9 +10,19 @@ for item in manifest:
     path = root / item['path']
     if not path.exists(): errors.append(f"missing source import: {item['path']}")
     elif len([p for p in path.rglob('*') if p.is_file()]) < 1: errors.append(f"empty source import: {item['path']}")
-required_docs = ['README.md', 'docs/PRODUCT_SPEC.md', 'docs/ARCHITECTURE.md', 'docs/MIGRATION_ROADMAP.md', 'governance/DELETION_CANDIDATES.md']
+required_docs = ['README.md', 'docs/PRODUCT_SPEC.md', 'docs/ARCHITECTURE.md', 'docs/MIGRATION_ROADMAP.md', 'docs/PERSONAL_PRODUCTION_ARCHITECTURE.md', 'docs/SECURITY_MODEL.md', 'docs/PRODUCTION_READINESS_CHECKLIST.md', 'docs/OPERATIONS_RUNBOOK.md', 'governance/DELETION_CANDIDATES.md']
 for required in required_docs:
     if not (root / required).exists(): errors.append(f"missing required doc: {required}")
+required_ops = [
+    'deploy/systemd/brenda-ai-cockpit-api.service',
+    'deploy/systemd/brenda-ai-cockpit-health.service',
+    'deploy/systemd/brenda-ai-cockpit-health.timer',
+    'deploy/runtime/cockpit-api.conf.example',
+    'apps/control-plane-api/src/backup.ts',
+    'apps/control-plane-api/src/healthcheck.ts',
+]
+for required in required_ops:
+    if not (root / required).exists(): errors.append(f"missing ops artifact: {required}")
 required_workspaces = ['packages/contracts', 'packages/context-fabric', 'packages/capability-registry', 'packages/policy', 'packages/quota-governor', 'packages/telemetry', 'packages/telemetry-reader', 'packages/intelligence', 'packages/adapters', 'apps/cockpit-ui', 'apps/control-plane-api', 'apps/agent-runtime-console']
 for workspace in required_workspaces:
     package_json = root / workspace / 'package.json'

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   summary,
   costBreakdown,
@@ -18,9 +18,41 @@ import {
 import { getExecutiveBrief, getTopRecommendations } from '@cockpit/intelligence';
 import './styles.css';
 
-type Dashboard = 'cost' | 'evidence' | 'sessions' | 'cron' | 'tools' | 'memory';
+type Dashboard = 'operations' | 'cost' | 'evidence' | 'sessions' | 'cron' | 'tools' | 'memory';
+type CommandStatus = 'queued' | 'pending_approval' | 'denied' | 'running' | 'succeeded' | 'failed' | 'cancelled';
+
+interface CommandRecord {
+  readonly id: string;
+  readonly requestedBy: string;
+  readonly action: string;
+  readonly target: string;
+  readonly risk: string;
+  readonly status: CommandStatus;
+  readonly policyDecision: string;
+  readonly policyReason: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+interface AuditEvent {
+  readonly id: number;
+  readonly createdAt: string;
+  readonly kind: string;
+  readonly actor: string;
+  readonly subject: string;
+  readonly eventHash: string;
+}
+
+interface ApiState {
+  readonly loading: boolean;
+  readonly error: string | null;
+  readonly commands: readonly CommandRecord[];
+  readonly audit: readonly AuditEvent[];
+  readonly chainOk: boolean | null;
+}
 
 const dashboards: { id: Dashboard; label: string; subtitle: string }[] = [
+  { id: 'operations', label: 'Operator Console', subtitle: 'Auth, commands, approvals y audit chain' },
   { id: 'cost', label: 'Cost Intelligence', subtitle: 'Modelos, tokens, coste y concentración' },
   { id: 'evidence', label: 'Evidence Ledger', subtitle: 'Verificaciones reales y comandos canónicos' },
   { id: 'sessions', label: 'Session Forensics', subtitle: 'Sesiones, intensidad y anomalías' },
@@ -28,6 +60,15 @@ const dashboards: { id: Dashboard; label: string; subtitle: string }[] = [
   { id: 'tools', label: 'Tool Analytics', subtitle: 'Mapa de uso de herramientas' },
   { id: 'memory', label: 'Memory Observatory', subtitle: 'Facts, confianza y memoria operacional' },
 ];
+
+const allowedActions = [
+  { id: 'run_secret_scan', label: 'Secret scan', risk: 'R2' },
+  { id: 'run_validate_repo', label: 'Validate repo', risk: 'R2' },
+  { id: 'run_typecheck', label: 'Typecheck', risk: 'R2' },
+  { id: 'run_tests', label: 'Tests', risk: 'R2' },
+  { id: 'run_build', label: 'Build', risk: 'R2' },
+  { id: 'run_verify', label: 'Full verify', risk: 'R2' },
+] as const;
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat('en-US').format(Math.round(n));
@@ -41,6 +82,16 @@ function pct(value: number, total: number): number {
   return total <= 0 ? 0 : Math.round((value / total) * 100);
 }
 
+async function apiFetch<T>(apiBase: string, token: string, path: string, init: RequestInit = {}): Promise<T> {
+  const headers = new Headers(init.headers);
+  headers.set('Authorization', `Bearer ${token}`);
+  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+  const response = await fetch(`${apiBase.replace(/\/$/, '')}${path}`, { ...init, headers });
+  const json = await response.json() as T & { error?: string; message?: string };
+  if (!response.ok) throw new Error(json.message ?? json.error ?? `HTTP ${response.status}`);
+  return json;
+}
+
 function Bar({ value, max, tone = 'teal' }: { value: number; max: number; tone?: 'teal' | 'amber' | 'red' | 'blue' }) {
   const width = Math.max(3, Math.min(100, pct(value, max)));
   return <div className="bar"><span className={`fill ${tone}`} style={{ width: `${width}%` }} /></div>;
@@ -48,6 +99,82 @@ function Bar({ value, max, tone = 'teal' }: { value: number; max: number; tone?:
 
 function StatCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return <article className="stat-card"><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>;
+}
+
+function StatusPill({ status }: { status: CommandStatus | 'ok' | 'bad' | 'idle' }) {
+  return <span className={`status-pill ${status}`}>{status}</span>;
+}
+
+function OperationsDashboard() {
+  const [apiBase, setApiBase] = useState('http://127.0.0.1:8787');
+  const [token, setToken] = useState('');
+  const [selectedAction, setSelectedAction] = useState<(typeof allowedActions)[number]['id']>('run_verify');
+  const [state, setState] = useState<ApiState>({ loading: false, error: null, commands: [], audit: [], chainOk: null });
+
+  const tokenReady = token.trim().length > 0;
+  const selectedMeta = allowedActions.find((action) => action.id === selectedAction)!;
+
+  async function refresh(): Promise<void> {
+    if (!tokenReady) {
+      setState((prev) => ({ ...prev, error: 'Introduce un bearer token para consultar endpoints protegidos.' }));
+      return;
+    }
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      const [commands, audit] = await Promise.all([
+        apiFetch<{ commands: CommandRecord[] }>(apiBase, token, '/api/v1/commands'),
+        apiFetch<{ audit: AuditEvent[]; chain_ok: boolean }>(apiBase, token, '/api/v1/audit'),
+      ]);
+      setState({ loading: false, error: null, commands: commands.commands, audit: audit.audit, chainOk: audit.chain_ok });
+    } catch (error) {
+      setState((prev) => ({ ...prev, loading: false, error: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+
+  async function submitCommand(): Promise<void> {
+    if (!tokenReady) return;
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      await apiFetch(apiBase, token, '/api/v1/commands', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'execute', target: selectedMeta.id, risk: selectedMeta.risk, payload: { requested_from: 'cockpit-ui' } }),
+      });
+      await refresh();
+    } catch (error) {
+      setState((prev) => ({ ...prev, loading: false, error: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+
+  async function approve(commandId: string): Promise<void> {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      await apiFetch(apiBase, token, `/api/v1/commands/${commandId}/approve`, { method: 'POST', body: JSON.stringify({ reason: 'approved from operator console' }) });
+      await refresh();
+    } catch (error) {
+      setState((prev) => ({ ...prev, loading: false, error: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+
+  async function execute(commandId: string): Promise<void> {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      await apiFetch(apiBase, token, `/api/v1/commands/${commandId}/execute`, { method: 'POST', body: JSON.stringify({}) });
+      await refresh();
+    } catch (error) {
+      setState((prev) => ({ ...prev, loading: false, error: error instanceof Error ? error.message : String(error) }));
+    }
+  }
+
+  useEffect(() => { void refresh(); }, []);
+
+  return <section className="dashboard-panel operations-panel">
+    <div className="stats-grid"><StatCard label="API auth" value={tokenReady ? 'configured' : 'missing'} detail="token solo en memoria del navegador" /><StatCard label="Audit chain" value={state.chainOk === null ? 'unknown' : state.chainOk ? 'OK' : 'BROKEN'} detail="hash-chain append-only" /><StatCard label="Commands" value={String(state.commands.length)} detail="cockpit.db queue" /><StatCard label="Allowed actions" value={String(allowedActions.length)} detail="catálogo cerrado, sin shell libre" /></div>
+    <div className="panel-grid two">
+      <article className="card control-card"><h3>Control privado</h3><label>API base<input value={apiBase} onChange={(event) => setApiBase(event.target.value)} aria-label="API base" /></label><label>Bearer token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} aria-label="Bearer token" autoComplete="off" /></label><label>Acción permitida<select value={selectedAction} onChange={(event) => setSelectedAction(event.target.value as typeof selectedAction)} aria-label="Allowed action">{allowedActions.map((action) => <option value={action.id} key={action.id}>{action.label} · {action.risk}</option>)}</select></label><div className="button-row"><button disabled={!tokenReady || state.loading} onClick={submitCommand}>Queue command</button><button disabled={!tokenReady || state.loading} onClick={refresh}>Refresh</button></div>{state.error ? <p className="error-box">{state.error}</p> : null}</article>
+      <article className="card"><h3>Audit ledger</h3><p className="chain-state">Chain: {state.chainOk === null ? <StatusPill status="idle" /> : state.chainOk ? <StatusPill status="ok" /> : <StatusPill status="bad" />}</p>{state.audit.slice(0, 8).map((event) => <div className="compact-row" key={event.id}><span>{event.kind}</span><strong>#{event.id}</strong><small>{event.createdAt} · {event.subject} · {event.eventHash.slice(0, 12)}</small></div>)}</article>
+    </div>
+    <article className="card command-table"><h3>Command queue</h3>{state.commands.length === 0 ? <p className="muted">Sin comandos en cockpit.db todavía.</p> : state.commands.slice(0, 12).map((command) => <div className="command-row" key={command.id}><div><strong>{command.target}</strong><small>{command.id} · {command.action} · {command.risk} · {command.policyReason}</small></div><StatusPill status={command.status} /><div className="button-row compact"><button disabled={command.status !== 'pending_approval' || state.loading} onClick={() => approve(command.id)}>Approve</button><button disabled={command.status !== 'queued' || state.loading} onClick={() => execute(command.id)}>Execute</button></div></div>)}</article>
+  </section>;
 }
 
 function CostDashboard() {
@@ -90,6 +217,7 @@ function MemoryDashboard() {
 }
 
 function DashboardBody({ active }: { active: Dashboard }) {
+  if (active === 'operations') return <OperationsDashboard />;
   if (active === 'cost') return <CostDashboard />;
   if (active === 'evidence') return <EvidenceDashboard />;
   if (active === 'sessions') return <SessionsDashboard />;
@@ -105,8 +233,8 @@ function IntelligenceStrip() {
 }
 
 export function App() {
-  const [active, setActive] = useState<Dashboard>('cost');
+  const [active, setActive] = useState<Dashboard>('operations');
   const activeMeta = dashboards.find((d) => d.id === active)!;
   const generated = useMemo(() => new Date(summary.generated_at).toLocaleString('es-ES'), []);
-  return <main className="cockpit-shell"><section className="hero"><div><p className="eyebrow">Hermes Real Telemetry Observatory</p><h1>Brenda AI Cockpit</h1><p>Observability real sobre {summary.total_sessions} sesiones, {formatNumber(summary.total_tool_calls)} tool calls, {summary.total_cron_executions} crons y {memoryFacts.length} facts de memoria. Sin mock data.</p></div><div className="hero-card"><span>snapshot</span><strong>{generated}</strong><small>top tool: {toolStats[0]?.tool_name ?? 'n/a'} · datos sanitizados</small></div></section><IntelligenceStrip /><nav className="dashboard-tabs" aria-label="Dashboards">{dashboards.map((d) => <button key={d.id} className={d.id === active ? 'active' : ''} onClick={() => setActive(d.id)}><strong>{d.label}</strong><span>{d.subtitle}</span></button>)}</nav><section className="section-title"><p className="eyebrow">{activeMeta.label}</p><h2>{activeMeta.subtitle}</h2></section><DashboardBody active={active} /></main>;
+  return <main className="cockpit-shell"><section className="hero"><div><p className="eyebrow">Hermes Private Operator Control Plane</p><h1>Brenda AI Cockpit</h1><p>Observability y operación privada sobre {summary.total_sessions} sesiones, {formatNumber(summary.total_tool_calls)} tool calls, {summary.total_cron_executions} crons y {memoryFacts.length} facts. Auth bearer, queue auditada y acciones cerradas.</p></div><div className="hero-card"><span>snapshot</span><strong>{generated}</strong><small>top tool: {toolStats[0]?.tool_name ?? 'n/a'} · datos sanitizados</small></div></section><IntelligenceStrip /><nav className="dashboard-tabs" aria-label="Dashboards">{dashboards.map((d) => <button key={d.id} className={d.id === active ? 'active' : ''} onClick={() => setActive(d.id)}><strong>{d.label}</strong><span>{d.subtitle}</span></button>)}</nav><section className="section-title"><p className="eyebrow">{activeMeta.label}</p><h2>{activeMeta.subtitle}</h2></section><DashboardBody active={active} /></main>;
 }

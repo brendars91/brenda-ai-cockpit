@@ -1,0 +1,20 @@
+[Unit]
+Description=Brenda AI Cockpit Control Plane API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/brenda-ai-cockpit
+EnvironmentFile=/home/ubuntu/brenda-ai-cockpit/deploy/runtime/cockpit-api.conf
+ExecStart=/usr/bin/node /home/ubuntu/brenda-ai-cockpit/apps/control-plane-api/dist/server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/brenda-ai-cockpit/state /home/ubuntu/brenda-ai-cockpit/backups
+
+[Install]
+WantedBy=multi-user.target

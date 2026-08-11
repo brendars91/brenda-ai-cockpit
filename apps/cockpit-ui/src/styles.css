@@ -56,5 +56,21 @@ button { font: inherit; }
 .timeline-item small { color: #8290ad; }
 .fact { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
 .fact strong { color: #47f0b5; }
-@media (max-width: 1000px) { .hero, .panel-grid.two { grid-template-columns: 1fr; } .dashboard-tabs, .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+.control-card label { display: grid; gap: 8px; margin: 12px 0; color: #aeb9d2; font-weight: 700; }
+.control-card input, .control-card select { width: 100%; border-radius: 14px; border: 1px solid rgba(255,255,255,.13); background: rgba(2,6,16,.78); color: #eef3ff; padding: 12px 14px; outline: none; }
+.control-card input:focus, .control-card select:focus { border-color: rgba(71,240,181,.7); box-shadow: 0 0 0 3px rgba(71,240,181,.14); }
+.button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+.button-row.compact { margin: 0; justify-content: flex-end; }
+.button-row button { border: 1px solid rgba(71,240,181,.42); color: #06120f; background: #47f0b5; border-radius: 999px; padding: 10px 14px; cursor: pointer; font-weight: 900; }
+.button-row button:disabled { opacity: .38; cursor: not-allowed; filter: grayscale(1); }
+.error-box { border: 1px solid rgba(255,92,122,.35); color: #ffd7df; background: rgba(255,46,99,.13); border-radius: 14px; padding: 12px; }
+.muted, .chain-state { color: #aeb9d2; }
+.status-pill { display: inline-flex; align-items: center; width: fit-content; border-radius: 999px; padding: 5px 10px; font-size: .74rem; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; border: 1px solid rgba(255,255,255,.12); color: #aeb9d2; }
+.status-pill.ok, .status-pill.queued, .status-pill.succeeded { color: #47f0b5; background: rgba(71,240,181,.11); border-color: rgba(71,240,181,.32); }
+.status-pill.bad, .status-pill.denied, .status-pill.failed { color: #ff8fa3; background: rgba(255,46,99,.11); border-color: rgba(255,46,99,.32); }
+.status-pill.pending_approval, .status-pill.running { color: #ffd166; background: rgba(255,209,102,.11); border-color: rgba(255,209,102,.32); }
+.command-table { margin-top: 18px; }
+.command-row { display: grid; grid-template-columns: 1fr auto 210px; gap: 14px; align-items: center; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.command-row small { display: block; margin-top: 5px; color: #8290ad; overflow-wrap: anywhere; }
+@media (max-width: 1000px) { .hero, .panel-grid.two { grid-template-columns: 1fr; } .dashboard-tabs, .stats-grid { grid-template-columns: repeat(2, 1fr); } .command-row { grid-template-columns: 1fr; } }
 @media (max-width: 650px) { .cockpit-shell { width: min(100% - 20px, 1220px); padding-top: 20px; } .dashboard-tabs, .stats-grid { grid-template-columns: 1fr; } .metric-row { grid-template-columns: 1fr; } }

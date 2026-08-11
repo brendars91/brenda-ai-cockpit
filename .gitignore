@@ -1,6 +1,10 @@
 # local runtime
 local-vars
 *.local
+deploy/runtime/cockpit-api.conf
+deploy/runtime/cockpit-token.txt
+state/
+backups/
 # dependencies/build
 node_modules/
 dist/

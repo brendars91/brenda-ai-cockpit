@@ -1,12 +1,35 @@
 # Brenda AI Cockpit
 
-Control plane avanzado para agentes IA, context fabric, policy, adapters, telemetry y ejecución determinista.
+Control plane privado para agentes IA, context fabric, policy, adapters, telemetry y ejecución determinista de operaciones personales.
 
 ## Qué es ahora
 
-Brenda AI Cockpit es un monorepo npm/TypeScript production-candidate local: consolida fuentes heredadas en paquetes canónicos, expone una API de control plane, sirve una UI operacional y ejecuta gates deterministas reales.
+Brenda AI Cockpit es un monorepo npm/TypeScript **production-candidate local** que está siendo promovido a **producción personal privada** para uso exclusivo de Brenda.
 
 No es solo documentación: `npm run verify` ejecuta escaneo de secretos, validación estructural, typecheck, tests y build de todos los workspaces.
+
+## Estado de producción personal
+
+Implementado y verificado en esta línea de hardening:
+
+- API Node HTTP con health superficial público.
+- Bearer auth con scopes `read`, `command` y `admin` para endpoints útiles.
+- CORS cerrado por allowlist.
+- Host seguro por defecto (`127.0.0.1`).
+- Public bind bloqueado salvo override explícito.
+- Tests adversariales para missing auth, token inválido, scope insuficiente, CORS, payload grande y public bind.
+
+Pendiente para declarar **nivel 10 completo**:
+
+- `cockpit.db` propio con SQLite WAL y migraciones.
+- Audit ledger append-only.
+- Command queue persistente.
+- Policy enforcement sobre acciones reales.
+- Allowed action executor sin shell libre.
+- UI operator-grade con auth/commands/audit.
+- Deploy systemd/Tailscale.
+- Backup y restore drill.
+- Health deep, alertas, threat model y release tag.
 
 ## Fuentes integradas
 
@@ -18,7 +41,7 @@ No es solo documentación: `npm run verify` ejecuta escaneo de secretos, validac
 ## Apps
 
 - `apps/cockpit-ui` — dashboard React/Vite.
-- `apps/control-plane-api` — API Node HTTP readonly/control plane.
+- `apps/control-plane-api` — API Node HTTP para control plane personal.
 - `apps/agent-runtime-console` — runtime status y autorización de comandos.
 
 ## Paquetes
@@ -50,20 +73,19 @@ Gate esperado:
 
 ## Smoke local
 
+Health superficial sin auth:
+
 ```bash
 node apps/control-plane-api/dist/server.js 8789
 curl -fsS http://127.0.0.1:8789/api/health
-curl -fsS http://127.0.0.1:8789/api/v1/capabilities
-curl -fsS http://127.0.0.1:8789/api/v1/agents/status
 ```
 
-Para la UI:
+Endpoints útiles requieren bearer token configurado. En producción personal, cargar el token desde archivo local protegido y acceder por loopback/Tailscale.
 
-```bash
-cd apps/cockpit-ui
-npx vite preview --host 127.0.0.1 --port 5190
-```
+## Documentos de producción
 
-## Estado honesto
-
-Verificado como production-candidate local. Para producción externa faltan auth/JWT, storage productivo, ejecución real persistente, CI remoto verde y despliegue protegido.
+- `docs/PERSONAL_PRODUCTION_ARCHITECTURE.md`
+- `docs/SECURITY_MODEL.md`
+- `docs/PRODUCTION_READINESS_CHECKLIST.md`
+- `docs/ARCHITECTURE.md`
+- `docs/MIGRATION_ROADMAP.md`

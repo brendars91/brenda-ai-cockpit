@@ -1,0 +1,8 @@
+[Unit]
+Description=Brenda AI Cockpit health probe
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/ubuntu/brenda-ai-cockpit
+EnvironmentFile=/home/ubuntu/brenda-ai-cockpit/deploy/runtime/cockpit-api.conf
+ExecStart=/usr/bin/node /home/ubuntu/brenda-ai-cockpit/apps/control-plane-api/dist/healthcheck.js http://127.0.0.1:8787
