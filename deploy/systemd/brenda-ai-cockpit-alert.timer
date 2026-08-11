@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Brenda AI Cockpit Discord alert watchdog every 5 minutes
+
+[Timer]
+OnBootSec=60s
+OnUnitActiveSec=5min
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target

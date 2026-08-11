@@ -8,7 +8,7 @@
 - [x] `/api/health` superficial público.
 - [x] Endpoints útiles requieren auth.
 - [x] CORS por allowlist.
-- [ ] Acceso Tailscale verificado en host de producción.
+- [x] Acceso Tailscale verificado en host de producción: `tailscale serve status` muestra `https://gemini-arm-node-01.tail22d85a.ts.net:8787 (tailnet only)` y browser QA confirmó `/api/health` OK + `/api/v1/commands` cerrado sin bearer.
 
 ### Seguridad API
 - [x] Bearer auth con scopes.
@@ -16,7 +16,7 @@
 - [x] Token readonly bloqueado en endpoint mutativo.
 - [x] Payload grande bloqueado.
 - [x] Action/risk inválidos fallan cerrado antes de policy.
-- [ ] Rotación/revocación persistente multi-token en `cockpit.db`.
+- [x] Rotación/revocación por token file verificada en host: drill cambió token, reinició API, token viejo devolvió 401 y token nuevo 200. Multi-token persistente queda fuera de scope por diseño single-operator.
 
 ### Datos
 - [x] Hermes DBs leídas readonly.
@@ -45,20 +45,20 @@
 - [x] Healthcheck superficial y profundo autenticado.
 - [x] Backup CLI.
 - [x] Restore-test CLI.
-- [ ] Instalación systemd real en host aprobada y ejecutada.
-- [ ] Tailscale Serve/Funnel verificado privado.
-- [ ] Alertas Discord ante fallo.
+- [x] Instalación systemd real en host aprobada y ejecutada: API active/enabled, health timer active/enabled, proceso `User=ubuntu`, listener solo `127.0.0.1:8787`.
+- [x] Tailscale Serve verificado privado: `:8787 (tailnet only)`; Funnel no activado.
+- [x] Alertas Discord ante fallo: watchdog Python verde silencioso, `--test` entregó mensaje Discord `1536659525229215754`.
 
 ### Recuperación
 - [x] Backup físico de SQLite.
 - [x] Manifest con sha256/tamaño.
 - [x] Restore drill probado por test automatizado.
-- [ ] Rollback systemd probado en host real.
+- [x] Rollback systemd probado en host real: unidades copiadas a `backups/systemd-rollback-drill-20260811/`, restauradas con `install`, `daemon-reload`, restart API y smoke post-rollback `succeeded`.
 
 ### Release
 - [x] CI remoto verde: GitHub Actions `deterministic-gates` success en PR #4.
 - [x] Smoke local API/UI contra build real: auth, command execution, health deep, backup y restore-test.
-- [ ] Smoke post-deploy systemd/Tailscale verde.
+- [x] Smoke post-deploy systemd/Tailscale verde: API systemd activa, health deep por timer OK, Tailscale HTTPS `/api/health` OK, endpoint útil cerrado sin bearer, submit+execute post-deploy `succeeded`.
 - [x] Browser QA UI.
 - [x] Threat model actualizado al código.
 - [ ] Tag `v0.2.0-personal-production`.
