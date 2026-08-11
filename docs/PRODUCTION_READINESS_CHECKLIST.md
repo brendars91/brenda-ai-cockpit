@@ -56,12 +56,12 @@
 - [x] Rollback systemd probado en host real: unidades copiadas a `backups/systemd-rollback-drill-20260811/`, restauradas con `install`, `daemon-reload`, restart API y smoke post-rollback `succeeded`.
 
 ### Release
-- [x] CI remoto verde: GitHub Actions `deterministic-gates` success en PR #4.
+- [x] CI remoto verde: GitHub Actions `deterministic-gates` success en release commit `13ec38d37932b6fd96b250696e8625ad944e47b9` (`31476037064`).
 - [x] Smoke local API/UI contra build real: auth, command execution, health deep, backup y restore-test.
 - [x] Smoke post-deploy systemd/Tailscale verde: API systemd activa, health deep por timer OK, Tailscale HTTPS `/api/health` OK, endpoint útil cerrado sin bearer, submit+execute post-deploy `succeeded`.
 - [x] Browser QA UI.
 - [x] Threat model actualizado al código.
-- [ ] Tag `v0.2.0-personal-production`.
+- [x] Tag `v0.2.0-personal-production` creado sobre el release final verificado.
 
 ## Regla de honestidad
-Mientras haya checks pendientes de host real/CI remoto/browser QA, el repo puede estar endurecido y validado localmente, pero no se declara producción personal nivel 10.
+Todos los checks de host real, CI remoto, smoke local/post-deploy, browser QA, recovery, alertas y release tag deben estar verdes antes de declarar producción personal nivel 10.
