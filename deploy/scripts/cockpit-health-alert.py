@@ -92,6 +92,10 @@ def collect_alerts() -> list[str]:
         alerts.append('api service is not active')
     if not run_ok(['systemctl', 'is-enabled', '--quiet', 'brenda-ai-cockpit-api.service']):
         alerts.append('api service is not enabled')
+    if not run_ok(['systemctl', 'is-active', '--quiet', 'brenda-ai-cockpit-ui.service']):
+        alerts.append('ui service is not active')
+    if not run_ok(['systemctl', 'is-enabled', '--quiet', 'brenda-ai-cockpit-ui.service']):
+        alerts.append('ui service is not enabled')
     if not run_ok(['systemctl', 'is-active', '--quiet', 'brenda-ai-cockpit-health.timer']):
         alerts.append('health timer is not active')
     if not run_ok(['systemctl', 'is-enabled', '--quiet', 'brenda-ai-cockpit-health.timer']):
@@ -100,9 +104,15 @@ def collect_alerts() -> list[str]:
         sock.settimeout(2)
         if sock.connect_ex(('127.0.0.1', 8787)) != 0:
             alerts.append('api is not reachable on 127.0.0.1:8787')
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(2)
+        if sock.connect_ex(('127.0.0.1', 8788)) != 0:
+            alerts.append('ui is not reachable on 127.0.0.1:8788')
     serve = run_out(['tailscale', 'serve', 'status'])
     if 'https://gemini-arm-node-01.tail22d85a.ts.net:8787 (tailnet only)' not in serve:
         alerts.append('tailscale serve :8787 is missing or not tailnet-only')
+    if 'https://gemini-arm-node-01.tail22d85a.ts.net:8788 (tailnet only)' not in serve:
+        alerts.append('tailscale serve :8788 is missing or not tailnet-only')
     try:
         token = TOKEN_FILE.read_text(encoding='utf-8').strip()
         req = urllib.request.Request('http://127.0.0.1:8787/api/v1/audit', headers={'Authorization': f'Bearer {token}'})

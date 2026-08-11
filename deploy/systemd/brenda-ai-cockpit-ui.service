@@ -1,0 +1,21 @@
+[Unit]
+Description=Brenda AI Cockpit private UI
+After=network-online.target brenda-ai-cockpit-api.service
+Wants=network-online.target brenda-ai-cockpit-api.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/brenda-ai-cockpit
+ExecStart=/usr/bin/python3 /home/ubuntu/brenda-ai-cockpit/deploy/scripts/cockpit-ui-static-server.py --host 127.0.0.1 --port 8788
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target

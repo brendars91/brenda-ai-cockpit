@@ -105,8 +105,15 @@ function StatusPill({ status }: { status: CommandStatus | 'ok' | 'bad' | 'idle' 
   return <span className={`status-pill ${status}`}>{status}</span>;
 }
 
+function getDefaultApiBase(): string {
+  if (typeof window === 'undefined') return 'http://127.0.0.1:8787';
+  const { protocol, hostname } = window.location;
+  if (hostname.endsWith('.ts.net')) return `${protocol}//${hostname}:8787`;
+  return 'http://127.0.0.1:8787';
+}
+
 function OperationsDashboard() {
-  const [apiBase, setApiBase] = useState('http://127.0.0.1:8787');
+  const [apiBase, setApiBase] = useState(() => getDefaultApiBase());
   const [token, setToken] = useState('');
   const [selectedAction, setSelectedAction] = useState<(typeof allowedActions)[number]['id']>('run_verify');
   const [state, setState] = useState<ApiState>({ loading: false, error: null, commands: [], audit: [], chainOk: null });
