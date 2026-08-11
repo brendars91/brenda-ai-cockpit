@@ -3,8 +3,12 @@ import Database from 'better-sqlite3';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { tokenRecordFromPlaintext, type AuthConfig } from './auth.js';
 import { createApiServer } from './server.js';
 import { readSummary, readSessions, readCosts, readTools, readCron, readEvidence, readMemory, routeData, type ApiPaths } from './readers.js';
+
+const readToken = 'fake-read-token-0000000000000000';
+const auth: AuthConfig = { tokens: [tokenRecordFromPlaintext('read', readToken, ['read'])] };
 
 let fixtureDir = '';
 let paths: ApiPaths;
@@ -106,7 +110,7 @@ describe('sqlite readers over deterministic fixture databases', () => {
 
 describe('control-plane-api HTTP server', () => {
   it('serves /api/health and /api/summary as JSON using injected fixture paths', async () => {
-    const server = createApiServer(paths);
+    const server = createApiServer({ paths, auth });
     await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
     const address = server.address();
     if (!address || typeof address === 'string') throw new Error('No server address');
@@ -114,7 +118,7 @@ describe('control-plane-api HTTP server', () => {
     const health = await fetch(`${base}/api/health`);
     expect(health.status).toBe(200);
     expect((await health.json()).ok).toBe(true);
-    const summary = await fetch(`${base}/api/summary`);
+    const summary = await fetch(`${base}/api/summary`, { headers: { Authorization: `Bearer ${readToken}` } });
     expect(summary.status).toBe(200);
     expect((await summary.json()).sessions.count).toBe(1);
     await new Promise<void>((resolve) => server.close(() => resolve()));

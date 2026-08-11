@@ -1,123 +1,86 @@
 # Brenda AI Cockpit - Architecture
 
-## System Overview
-Brenda AI Cockpit implements a layered microservices architecture with a unified control plane. All components are built as TypeScript/JavaScript packages with Python tooling for security and validation.
+## Estado actual
+Brenda AI Cockpit es un monorepo npm/TypeScript para un control plane personal de agentes. El estado actual es **production-candidate local** con CI remoto verde y una primera frontera de producción personal en progreso: autenticación bearer, CORS cerrado y host seguro por defecto.
 
-## Architecture Layers
+## Capas implementadas
 
 ### 1. Control Plane API (`apps/control-plane-api`)
-- **Purpose**: Central REST/gRPC API for agent orchestration
-- **Tech Stack**: Node.js + Express/Fastify
-- **Key Features**:
-  - Capability registration (`/api/v1/capabilities`)
-  - Agent status monitoring (`/api/v1/agents/status`)
-  - Task routing and assignment
-  - Quota enforcement hooks
-- **Dependencies**: `@cockpit/contracts`, `@cockpit/policy`, `@cockpit/quota-governor`
+- **Tech stack real:** Node.js `node:http` + TypeScript.
+- **Endpoints readonly:** health, telemetry reads, adapters, capabilities, agent status.
+- **Endpoint de delegación:** `/api/v1/delegate` valida requests y queda protegido por scope `command`.
+- **Seguridad actual:** `/api/health` superficial es público; el resto requiere bearer auth cuando el servidor se configura para producción personal.
+- **Boundary de red:** el arranque por defecto usa loopback (`127.0.0.1`). Public bind requiere override explícito.
 
-### 2. Agent Runtime Console (`apps/agent-runtime-console`)
-- **Purpose**: Backend service for agent lifecycle management
-- **Tech Stack**: Python 3.11
-- **Key Features**:
-  - Agent heartbeat monitoring
-  - Task queue management
-  - Event logging and tracing
-- **Dependencies**: `@cockpit/context-fabric`, `@cockpit/telemetry`
+### 2. Cockpit UI (`apps/cockpit-ui`)
+- **Tech stack real:** React + TypeScript + Vite.
+- **Estado:** build productivo verificado; pendiente de integrar flujo auth/commands/audit de producción personal.
 
-### 3. Cockpit UI (`apps/cockpit-ui`)
-- **Purpose**: Frontend dashboard for operational visibility
-- **Tech Stack**: React 18 + TypeScript + Vite
-- **Key Features**:
-  - Real-time agent status dashboard
-  - Capability registry viewer
-  - Task routing visualization
-- **Dependencies**: `@cockpit/contracts` (type definitions)
+### 3. Agent Runtime Console (`apps/agent-runtime-console`)
+- **Tech stack real:** TypeScript package.
+- **Estado:** expone estado runtime determinista y autorización de comandos sobre policy. Todavía no es executor persistente.
 
-### 4. Packages Layer
+### 4. Packages
+- `@cockpit/contracts`: tipos y contratos base.
+- `@cockpit/context-fabric`: event log/context primitives.
+- `@cockpit/capability-registry`: registro y búsqueda determinista de capacidades.
+- `@cockpit/policy`: motor fail-closed para roles, riesgos y approvals.
+- `@cockpit/quota-governor`: cuotas y freezes.
+- `@cockpit/telemetry`: spans, métricas y redacción.
+- `@cockpit/telemetry-reader`: snapshots/lecturas operativas.
+- `@cockpit/intelligence`: scoring, findings y skill marketplace.
+- `@cockpit/adapters`: Hermes, Claude Code, Codex y Paperclip.
 
-#### `@cockpit/contracts`
-- API specification schemas (OpenAPI 3.0)
-- Request/response type definitions
-- Validation schemas using Zod
+## Data flow actual
 
-#### `@cockpit/policy`
-- Security policy engine
-- Task routing rules
-- Access control policies
-
-#### `@cockpit/context-fabric`
-- Event store (SQLite backed)
-- Context persistence layer
-- Traceability metadata
-
-#### `@cockpit/capability-registry`
-- Agent capability indexing
-- Capability matching algorithms
-
-#### `@cockpit/quota-governor`
-- Per-agent usage limits
-- Rate limiting enforcement
-- Quota violation alerts
-
-#### `@cockpit/telemetry`
-- Metrics collection
-- Event logging
-- Performance monitoring
-
-#### `@cockpit/adapters`
-- Pluggable adapters for:
-  - Hermes (native integration)
-  - Claude Code (Anthropic API)
-  - OpenAI Codex (API integration)
-  - Paperclip (local service)
-
-### 5. Tooling Layer
-
-#### Security Tools (`tools/`)
-- `secret_scan.py`: Automated secret detection with Neptune token pattern support
-- `validate_repo.py`: Source import and documentation validation
-
-#### CI/CD (`deterministic-gates`)
-- Runs verification pipeline on every commit
-- Blocks merge on any failure
-- Enforces code quality standards
-
-## Data Flow
-
-```
-[Cockpit UI] ↔ [Control Plane API] ↔ [Policy Engine]
-                                    ↓
-                          [Quota Governor]
-                                    ↓
-                     [Capability Registry] ↔ [Agents]
-                                    ↓
-                    [Context Fabric (Event Store)]
-                                    ↓
-                            [Telemetry/Metrics]
+```text
+Cockpit UI / curl
+    -> Control Plane API
+       -> auth/CORS boundary
+       -> readonly Hermes SQLite readers
+       -> adapters/capability registry/runtime status
 ```
 
-## Deployment Architecture
+## Data flow objetivo para producción personal
 
-### Local Development
-- All services run on localhost
-- SQLite file-based storage
-- Vite dev server for UI
-- Python tools for validation
+```text
+Brenda
+  -> Tailscale/loopback only
+  -> Cockpit UI
+  -> authenticated Control Plane API
+  -> Policy Enforcement Point
+  -> cockpit.db command queue + audit ledger
+  -> allowed action executor
+  -> Hermes/GitHub/local services
+```
 
-### Production
-- Docker containerized services
-- PostgreSQL for context fabric (SQLite for dev)
-- Shared filesystem or object storage for artifacts
-- Tailscale/VPN for internal service communication
+## Storage
 
-## Security Model
-- Zero hardcoded credentials
-- Automated secret scanning in CI
-- API authentication via signed JWTs
-- Role-based access control (RBAC) in policy engine
+### Actual
+- Lee DBs de Hermes en modo readonly para dashboards.
+- No debe escribir en DBs de Hermes.
 
-## Reliability
-- Health check endpoints: `/api/health`
-- Graceful degradation when agents are unreachable
-- Event-driven architecture with retry logic
-- Full traceability of all agent actions
+### Objetivo producción personal
+- Añadir `cockpit.db` propio con SQLite WAL para commands, approvals, audit, deployments y health snapshots.
+- Mantener DBs de Hermes como fuentes readonly.
+
+## Security model resumido
+- Privado por defecto: loopback/Tailscale.
+- Auth obligatoria para endpoints útiles.
+- CORS cerrado por allowlist.
+- Sin credenciales hardcodeadas.
+- Secret scan en CI.
+- Policy antes de acciones mutativas.
+- No shell libre desde UI/API.
+
+## Reliability actual
+- `/api/health` superficial.
+- CI remoto `deterministic-gates` ejecuta `npm ci` + `npm run verify`.
+
+## Reliability objetivo
+- systemd con restart.
+- health deep autenticado.
+- smoke post-deploy.
+- backup/restore probado.
+- rollback de release.
+- alertas en fallo.

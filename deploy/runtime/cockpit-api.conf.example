@@ -1,0 +1,6 @@
+COCKPIT_HOST=127.0.0.1
+COCKPIT_PORT=8787
+COCKPIT_ALLOWED_ORIGINS=http://127.0.0.1:5180
+COCKPIT_DB_PATH=/home/ubuntu/brenda-ai-cockpit/state/cockpit.db
+COCKPIT_TOKEN_FILE=/home/ubuntu/brenda-ai-cockpit/deploy/runtime/cockpit-token.txt
+COCKPIT_TOKEN_SCOPES=admin
