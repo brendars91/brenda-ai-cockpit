@@ -1,74 +1,39 @@
-import { RetryMiddleware } from './retry';
-import { readSessions, readCosts, readTools, readCron, readEvidence, readMemory } from './readers';
+export interface RetryOptions {
+  readonly maxAttempts?: number;
+  readonly baseDelayMs?: number;
+  readonly factor?: number;
+  readonly retryable?: (error: unknown) => boolean;
+}
 
-export class TelemetryRetryMiddleware {
-  private readonly retry = new RetryMiddleware();
-  private readonly maxRetries = 3;
+export interface RetryAttempt {
+  readonly attempt: number;
+  readonly delayMs: number;
+  readonly error: unknown;
+}
 
-  async readSessions(dbPath: string = '/home/ubuntu/.hermes/state.db', limit = 100): Promise<any> {
-    return this.retry.execute(() => readSessions(dbPath, limit), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
+export class RetryMiddleware {
+  public readonly attempts: RetryAttempt[] = [];
 
-  async readCosts(dbPath: string = '/home/ubuntu/.hermes/state.db'): Promise<any> {
-    return this.retry.execute(() => readCosts(dbPath), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
+  public async execute<T>(operation: () => Promise<T> | T, options: RetryOptions = {}): Promise<T> {
+    const maxAttempts = Math.max(1, options.maxAttempts ?? 3);
+    const baseDelayMs = Math.max(0, options.baseDelayMs ?? 100);
+    const factor = Math.max(1, options.factor ?? 2);
+    const retryable = options.retryable ?? (() => true);
 
-  async readTools(dbPath: string = '/home/ubuntu/.hermes/state.db') {
-    return this.retry.execute(() => readTools(dbPath), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
-
-  async readCron(dbPath: string = '/home/ubuntu/.hermes/cron/executions.db') {
-    return this.retry.execute(() => readCron(dbPath), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
-
-  async readEvidence(dbPath: string = '/home/ubuntu/.hermes/verification_evidence.db') {
-    return this.retry.execute(() => readEvidence(dbPath), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
-
-  async readMemory(dbPath: string = '/home/ubuntu/.hermes/memory_store.db') {
-    return this.retry.execute(() => readMemory(dbPath), {
-      maxAttempts: this.maxRetries,
-      baseDelay: 300,
-      factor: 2,
-    });
-  }
-
-  // New hook for pre-tool-call retry
-  async readToolCall(path: string): Promise<any> {
-    return this.retry.execute(async () => {
-      // Simulate a tool call with potential failure
-      const db = new Database(dbPath, { readonly: true, fileMustExist: true });
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       try {
-        const result = await readSessions(dbPath, 1);
-        return { success: true, data: result };
+        return await operation();
       } catch (error) {
-        // Simulate transient failure
-        throw error;
-      } finally {
-        db.close();
+        if (attempt >= maxAttempts || !retryable(error)) {
+          throw error;
+        }
+        const delayMs = Math.round(baseDelayMs * factor ** (attempt - 1));
+        this.attempts.push({ attempt, delayMs, error });
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
       }
-    });
+    }
+    throw new Error('retry middleware reached unreachable state');
   }
 }
 
-export const telemetryRetry = new TelemetryRetryMiddleware();
+export const telemetryRetry = new RetryMiddleware();

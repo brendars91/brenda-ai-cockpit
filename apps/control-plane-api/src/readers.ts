@@ -1,3 +1,6 @@
+import { adapters } from '@cockpit/adapters';
+import { CapabilityRegistry } from '@cockpit/capability-registry';
+import { listRuntimeAgents } from '@cockpit/agent-runtime-console';
 import Database from 'better-sqlite3';
 
 export interface ApiPaths {
@@ -97,8 +100,28 @@ export function readMemory(paths: ApiPaths = defaultPaths) {
   `);
 }
 
+
+function buildCapabilityRegistry() {
+  const registry = new CapabilityRegistry();
+  for (const adapter of adapters) {
+    for (const capability of adapter.capabilities) {
+      registry.register({
+        id: `${adapter.id}.${capability}`,
+        adapterId: adapter.id,
+        capability,
+        risk: capability === 'terminal' || capability === 'cron' ? 'R2' : 'R1',
+        evidenceRequired: true,
+      });
+    }
+  }
+  return registry;
+}
+
 export function routeData(pathname: string, paths: ApiPaths = defaultPaths) {
   if (pathname === '/api/health') return { ok: true, service: 'brenda-ai-cockpit-control-plane', mode: 'live-sqlite', time: new Date().toISOString() };
+  if (pathname === '/api/v1/adapters') return { adapters };
+  if (pathname === '/api/v1/capabilities') return { capabilities: buildCapabilityRegistry().list() };
+  if (pathname === '/api/v1/agents/status') return { agents: listRuntimeAgents() };
   if (pathname === '/api/summary') return readSummary(paths);
   if (pathname === '/api/sessions') return readSessions(paths);
   if (pathname === '/api/costs') return readCosts(paths);

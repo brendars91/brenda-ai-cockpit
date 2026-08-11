@@ -11,7 +11,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Secret scan
-        run: python3 tools/secret_scan.py .
-      - name: Repo contract check
-        run: python3 tools/validate_repo.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci --workspaces --include-workspace-root --no-audit --no-fund
+      - run: npm run verify

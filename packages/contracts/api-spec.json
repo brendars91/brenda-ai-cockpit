@@ -1,0 +1,18 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Brenda AI Cockpit Control Plane API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/agents/status": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Agent status"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,3 @@
-# agent-runtime-console
+# Agent Runtime Console
 
-App objetivo para Brenda AI Cockpit. Se implementa por fases desde las fuentes saneadas.
+Workspace verified for runtime status projection and policy authorization of agent commands. It does not execute external agents directly; it exposes deterministic status and approval semantics consumed by the control plane.

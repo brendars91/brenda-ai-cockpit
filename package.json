@@ -8,21 +8,33 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test --workspaces",
-    "build": "npm run build --workspaces",
-    "typecheck": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/policy && npm run build --workspace @cockpit/quota-governor && npm run typecheck --workspace @cockpit/cockpit-web",
-    "verify": "python3 tools/secret_scan.py . && python3 tools/validate_repo.py && npm run typecheck && npm run test && npm run build",
-    "cockpit-pages-build": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/cockpit-web"
+    "scan:secrets": "python3 tools/secret_scan.py .",
+    "validate:repo": "python3 tools/validate_repo.py",
+    "typecheck": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/adapters && npm run build --workspace @cockpit/capability-registry && npm run build --workspace @cockpit/policy && npm run build --workspace @cockpit/quota-governor && npm run build --workspace @cockpit/telemetry && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/intelligence && npm run build --workspace @cockpit/agent-runtime-console && npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "verify": "npm run scan:secrets && npm run validate:repo && npm run typecheck && npm run test && npm run build",
+    "cockpit-pages-build": "npm run build --workspace @cockpit/contracts && npm run build --workspace @cockpit/context-fabric && npm run build --workspace @cockpit/telemetry-reader && npm run build --workspace @cockpit/intelligence && npm run build --workspace @cockpit/cockpit-web"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@vitest/ui": "^4.1.10",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^27.4.0",
+    "tsx": "^4.20.6"
   },
   "dependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "better-sqlite3": "^13.0.3",
-    "zod": "^4.4.3"
-  }
+    "zod": "^4.4.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "vite": "^7.3.6",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "pino": "^10.1.0"
+  },
+  "packageManager": "npm@10.9.0"
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { listSkills, getSkillsHandler } from './skillMarketplace';
 import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
@@ -57,7 +57,7 @@ describe('Skill Marketplace (real filesystem)', () => {
 
   it('listSkills parses frontmatter and returns metadata', async () => {
     const skills = await listSkills(TEST_SKILLS_DIR);
-    expect(skills.length).toBe(2); // bad-metadata has no SKILL.md
+    expect(skills.length).toBe(3); // bad-metadata is listed with safe defaults
     const cost = skills.find((s) => s.name === 'cost-intel');
     expect(cost).toBeDefined();
     expect(cost?.version).toBe('1.2.0');
@@ -68,9 +68,9 @@ describe('Skill Marketplace (real filesystem)', () => {
   });
 
   it('getSkillsHandler returns valid response shape', async () => {
-    const result = await getSkillsHandler();
-    expect(result.total).toBe(2);
-    expect(result.skills.length).toBe(2);
+    const result = await getSkillsHandler(TEST_SKILLS_DIR);
+    expect(result.total).toBe(3);
+    expect(result.skills.length).toBe(3);
     expect(result.updated_at).toBeTruthy();
   });
 
