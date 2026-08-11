@@ -1,8 +1,8 @@
 import { createServer } from 'node:http';
-import { routeData } from './readers.js';
+import { routeData, type ApiPaths } from './readers.js';
 import { validateDelegateRequest } from './delegate.js';
 
-export function createApiServer() {
+export function createApiServer(paths?: ApiPaths) {
   return createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,7 +12,7 @@ export function createApiServer() {
     if (req.method !== 'GET' && req.method !== 'POST') { res.writeHead(405, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'method_not_allowed' })); return; }
     try {
       if (req.method === 'GET') {
-        const data = routeData(url.pathname);
+        const data = routeData(url.pathname, paths);
         if (data === null) { res.writeHead(404, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'not_found', path: url.pathname })); return; }
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); return;
       }
