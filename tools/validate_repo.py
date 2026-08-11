@@ -15,10 +15,12 @@ for required in required_docs:
     if not (root / required).exists(): errors.append(f"missing required doc: {required}")
 required_ops = [
     'deploy/systemd/brenda-ai-cockpit-api.service',
+    'deploy/systemd/brenda-ai-cockpit-ui.service',
     'deploy/systemd/brenda-ai-cockpit-health.service',
     'deploy/systemd/brenda-ai-cockpit-health.timer',
     'deploy/systemd/brenda-ai-cockpit-alert.service',
     'deploy/systemd/brenda-ai-cockpit-alert.timer',
+    'deploy/scripts/cockpit-ui-static-server.py',
     'deploy/scripts/cockpit-health-alert.py',
     'deploy/runtime/cockpit-api.conf.example',
     'apps/control-plane-api/src/backup.ts',

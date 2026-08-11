@@ -33,15 +33,18 @@ Esto modifica configuración del host. Ejecutar solo tras aprobación explícita
 
 ```bash
 sudo cp deploy/systemd/brenda-ai-cockpit-api.service /etc/systemd/system/
+sudo cp deploy/systemd/brenda-ai-cockpit-ui.service /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-health.service /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-health.timer /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-alert.service /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-alert.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now brenda-ai-cockpit-api.service
+sudo systemctl enable --now brenda-ai-cockpit-ui.service
 sudo systemctl enable --now brenda-ai-cockpit-health.timer
 sudo systemctl enable --now brenda-ai-cockpit-alert.timer
 systemctl status brenda-ai-cockpit-api.service --no-pager
+systemctl status brenda-ai-cockpit-ui.service --no-pager
 systemctl list-timers brenda-ai-cockpit-health.timer brenda-ai-cockpit-alert.timer --no-pager
 ```
 
@@ -52,10 +55,11 @@ Comando verificado en OCI:
 
 ```bash
 tailscale serve --bg --https 8787 http://127.0.0.1:8787
+tailscale serve --bg --https 8788 http://127.0.0.1:8788
 tailscale serve status
 ```
 
-La salida esperada debe incluir `https://gemini-arm-node-01.tail22d85a.ts.net:8787 (tailnet only)` y no debe activar Funnel.
+La salida esperada debe incluir `https://gemini-arm-node-01.tail22d85a.ts.net:8787 (tailnet only)` y `https://gemini-arm-node-01.tail22d85a.ts.net:8788 (tailnet only)`, y no debe activar Funnel.
 
 ## Discord failure alerts
 El watchdog `deploy/scripts/cockpit-health-alert.py` debe permanecer silencioso en verde y enviar DM solo si detecta fallo. Prueba controlada de canal:
@@ -80,4 +84,4 @@ No declarar nivel 10 hasta que estén verdes:
 - Smoke API con token real.
 - Browser QA de UI contra API real.
 - Backup + restore-test real.
-- systemd instalado, API activa como `ubuntu`, health timer activo y alert timer activo.
+- systemd instalado, API+UI activas como `ubuntu`, health timer activo y alert timer activo.
