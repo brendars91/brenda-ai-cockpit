@@ -56,7 +56,7 @@
 - [ ] Rollback systemd probado en host real.
 
 ### Release
-- [ ] CI remoto verde.
+- [x] CI remoto verde: GitHub Actions `deterministic-gates` success en PR #4.
 - [x] Smoke local API/UI contra build real: auth, command execution, health deep, backup y restore-test.
 - [ ] Smoke post-deploy systemd/Tailscale verde.
 - [x] Browser QA UI.
