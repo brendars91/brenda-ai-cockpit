@@ -13,7 +13,10 @@
   },
   "dependencies": {
     "better-sqlite3": "^12.10.0",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "@cockpit/adapters": "*",
+    "@cockpit/capability-registry": "*",
+    "@cockpit/agent-runtime-console": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

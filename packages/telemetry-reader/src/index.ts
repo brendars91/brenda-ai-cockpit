@@ -129,7 +129,7 @@ export function getConcentrationRisk(): { model: string; percentage: number } | 
   if (costBreakdown.length === 0) return null;
   const top = costBreakdown[0];
   const total = getTotalTokens().input;
-  if (total === 0) return null;
+  if (top === undefined || total === 0) return null;
   return {
     model: top.model,
     percentage: Math.round((top.total_input_tokens / total) * 100),

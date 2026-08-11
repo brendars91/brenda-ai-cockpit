@@ -53,9 +53,9 @@ export async function listSkills(skillsDir: string = '/home/ubuntu/.hermes/skill
   return skills;
 }
 
-export async function getSkillsHandler() {
+export async function getSkillsHandler(skillsDir?: string) {
   try {
-    const skills = await listSkills();
+    const skills = await listSkills(skillsDir);
     return {
       skills,
       total: skills.length,

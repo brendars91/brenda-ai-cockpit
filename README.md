@@ -1,10 +1,12 @@
 # Brenda AI Cockpit
 
-Control plane avanzado para agentes, context fabric, policy, adapters y ejecución determinista.
+Control plane avanzado para agentes IA, context fabric, policy, adapters, telemetry y ejecución determinista.
 
-## Qué haría
+## Qué es ahora
 
-Brenda AI Cockpit sería el panel de mando canónico para controlar herramientas y agentes IA: registra capacidades, enruta tareas entre Hermes/Claude/Codex/Paperclip, aplica políticas de seguridad y cuotas, guarda contexto/eventos con trazabilidad y ofrece una UI operativa para ver qué agente hace qué, por qué y con qué evidencia.
+Brenda AI Cockpit es un monorepo npm/TypeScript production-candidate local: consolida fuentes heredadas en paquetes canónicos, expone una API de control plane, sirve una UI operacional y ejecuta gates deterministas reales.
+
+No es solo documentación: `npm run verify` ejecuta escaneo de secretos, validación estructural, typecheck, tests y build de todos los workspaces.
 
 ## Fuentes integradas
 
@@ -13,13 +15,13 @@ Brenda AI Cockpit sería el panel de mando canónico para controlar herramientas
 - `Creador-proyectos-compilador`
 - `Generador-proyectos-determinista`
 
-## Apps objetivo
+## Apps
 
-- `apps/cockpit-ui`
-- `apps/control-plane-api`
-- `apps/agent-runtime-console`
+- `apps/cockpit-ui` — dashboard React/Vite.
+- `apps/control-plane-api` — API Node HTTP readonly/control plane.
+- `apps/agent-runtime-console` — runtime status y autorización de comandos.
 
-## Paquetes objetivo
+## Paquetes
 
 - `packages/contracts`
 - `packages/policy`
@@ -27,15 +29,41 @@ Brenda AI Cockpit sería el panel de mando canónico para controlar herramientas
 - `packages/capability-registry`
 - `packages/quota-governor`
 - `packages/telemetry`
+- `packages/telemetry-reader`
+- `packages/intelligence`
 - `packages/adapters`
-
-## Estado actual
-
-Este repo es un corte inicial canónico: fuentes saneadas, documentación de arquitectura, roadmap de migración, gates deterministas y escaneo de secretos. No afirma que las apps ya estén reimplementadas como producto único; conserva las piezas útiles y fija el camino de producción.
 
 ## Verificación
 
 ```bash
-python3 tools/secret_scan.py .
-python3 tools/validate_repo.py
+npm install --workspaces --include-workspace-root --no-audit --no-fund
+npm run verify
 ```
+
+Gate esperado:
+
+- `secret_scan: PASS`
+- `validate_repo: PASS (4 source imports, 12 workspaces)`
+- TypeScript typecheck verde
+- Vitest verde
+- Build completo verde, incluida UI Vite
+
+## Smoke local
+
+```bash
+node apps/control-plane-api/dist/server.js 8789
+curl -fsS http://127.0.0.1:8789/api/health
+curl -fsS http://127.0.0.1:8789/api/v1/capabilities
+curl -fsS http://127.0.0.1:8789/api/v1/agents/status
+```
+
+Para la UI:
+
+```bash
+cd apps/cockpit-ui
+npx vite preview --host 127.0.0.1 --port 5190
+```
+
+## Estado honesto
+
+Verificado como production-candidate local. Para producción externa faltan auth/JWT, storage productivo, ejecución real persistente, CI remoto verde y despliegue protegido.
