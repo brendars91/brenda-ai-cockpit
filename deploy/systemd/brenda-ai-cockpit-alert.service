@@ -1,0 +1,11 @@
+[Unit]
+Description=Brenda AI Cockpit Discord alert watchdog
+After=brenda-ai-cockpit-api.service tailscaled.service
+Wants=brenda-ai-cockpit-api.service tailscaled.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/brenda-ai-cockpit
+ExecStart=/usr/bin/python3 /home/ubuntu/brenda-ai-cockpit/deploy/scripts/cockpit-health-alert.py

@@ -35,15 +35,37 @@ Esto modifica configuración del host. Ejecutar solo tras aprobación explícita
 sudo cp deploy/systemd/brenda-ai-cockpit-api.service /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-health.service /etc/systemd/system/
 sudo cp deploy/systemd/brenda-ai-cockpit-health.timer /etc/systemd/system/
+sudo cp deploy/systemd/brenda-ai-cockpit-alert.service /etc/systemd/system/
+sudo cp deploy/systemd/brenda-ai-cockpit-alert.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now brenda-ai-cockpit-api.service
 sudo systemctl enable --now brenda-ai-cockpit-health.timer
+sudo systemctl enable --now brenda-ai-cockpit-alert.timer
 systemctl status brenda-ai-cockpit-api.service --no-pager
-systemctl list-timers brenda-ai-cockpit-health.timer --no-pager
+systemctl list-timers brenda-ai-cockpit-health.timer brenda-ai-cockpit-alert.timer --no-pager
 ```
 
 ## Tailscale boundary
 Mantener API en `127.0.0.1`. Exponer solo mediante Tailscale Serve o SSH tunnel dentro de la tailnet. No usar `COCKPIT_ALLOW_PUBLIC_BIND=1` salvo diagnóstico temporal y documentado.
+
+Comando verificado en OCI:
+
+```bash
+tailscale serve --bg --https 8787 http://127.0.0.1:8787
+tailscale serve status
+```
+
+La salida esperada debe incluir `https://gemini-arm-node-01.tail22d85a.ts.net:8787 (tailnet only)` y no debe activar Funnel.
+
+## Discord failure alerts
+El watchdog `deploy/scripts/cockpit-health-alert.py` debe permanecer silencioso en verde y enviar DM solo si detecta fallo. Prueba controlada de canal:
+
+```bash
+python3 deploy/scripts/cockpit-health-alert.py
+python3 deploy/scripts/cockpit-health-alert.py --test
+```
+
+El primer comando debe producir stdout vacío. El segundo debe devolver JSON con `"ok": true` y `message_id`.
 
 ## Recovery drill
 1. Ejecutar backup.
@@ -58,4 +80,4 @@ No declarar nivel 10 hasta que estén verdes:
 - Smoke API con token real.
 - Browser QA de UI contra API real.
 - Backup + restore-test real.
-- systemd instalado y health timer activo, o bloqueo declarado si Brenda decide no instalarlo.
+- systemd instalado, API activa como `ubuntu`, health timer activo y alert timer activo.
