@@ -1,0 +1,53 @@
+name: Deploy Cockpit UI to GitHub Pages
+
+on:
+  push:
+    branches: [main, update-feature]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Cockpit UI
+        run: npm run build --filter cockpit-web || npm run build --workspace @cockpit/cockpit-web
+
+      - name: Configure Git for deployment
+        run: |
+          git config user.email "41898282+Saeloo@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+
+      - name: Create deployment directory
+        run: |
+          mkdir -p _site
+          cp -r apps/cockpit-ui/dist/* _site/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          cname: brendars91.github.io
+          destination_dir: ./
+          force_orphan: true
